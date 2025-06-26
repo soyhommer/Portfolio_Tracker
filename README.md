@@ -1,120 +1,156 @@
-# 馃搱 Cartera Inversor Personal (CIP) - MVP Streamlit
+# 📈 Cartera Inversor Personal (CIP) - MVP Streamlit
 
-## 馃攳 Descripci贸n
+## 🔍 Descripción
 
-Aplicaci贸n local para el seguimiento y edici贸n de carteras de inversi贸n personales, centrada en fondos UCITS, planes de pensiones espa帽oles (DGS) y acciones internacionales. Inspirada en la cartera gratuita de Morningstar, implementada r谩pidamente usando **Streamlit** y **Python**.
+Aplicación local para el seguimiento y edición de carteras de inversión personales, centrada en fondos UCITS, planes de pensiones españoles (DGS) y acciones internacionales. Inspirada en la cartera gratuita de Morningstar, implementada rápidamente usando **Streamlit** y **Python**.
 
 ---
 
-## 鈿欙笍 Funcionalidades incluidas (versi贸n MVP)
+## ⚙️ Funcionalidades incluidas (versión MVP)
 
-### 1. Gesti贸n de Carteras
+### 1. Gestión de Carteras
 
 * Crear nuevas carteras: nombre, moneda base, benchmark.
 * Editar nombre o eliminar cartera existente.
-* Men煤 desplegable superior para seleccionar cartera activa.
+* Menú desplegable superior para seleccionar cartera activa.
 
 ### 2. Seguimiento
 
 #### General
 
-* Tabla con activos actuales: nombre, 煤ltimo NAV, participaciones, valor, peso, fecha.
-* Integraci贸n de NAVs en tiempo real desde m煤ltiples fuentes (ver secci贸n fuentes).
+* Tabla con activos actuales: nombre, último NAV, participaciones, valor, peso, fecha.
+* Integración de NAVs en tiempo real desde múltiples fuentes (ver sección fuentes).
 
 #### Rentabilidad
 
-* Rentabilidad mensual (total, personal, 铆ndice) con gr谩fica de 11 meses + actual.
-* Rentabilidad anual (total, personal, 铆ndice) con gr谩fica de 10 a帽os + YTD.
+* Rentabilidad mensual (total, personal, índice) con gráfica de 11 meses + actual.
+* Rentabilidad anual (total, personal, índice) con gráfica de 10 años + YTD.
 * Tabla resumen con rentabilidades por periodo: 1s, 1m, 3m, 6m, YTD, 1a, 3a, 5a, 10a, desde compra.
-* Tabla de fondos en cartera con %A帽o, %3a, volatilidad, etc.
+* Tabla de fondos en cartera con %Año, %3a, volatilidad, etc.
 
-#### Ganancias / P茅rdidas
+#### Ganancias / Pérdidas
 
-* Tabla con historial de activos desde inicio: participaciones, desembolsos, reembolsos, valor mercado, ganancia/p茅rdida absoluta y %.
+* Tabla con historial de activos desde inicio: participaciones, desembolsos, reembolsos, valor mercado, ganancia/pérdida absoluta y %.
 
 #### Flujos
 
 * Tabla trimestral con compras netas, ventas netas, gastos, flujo neto.
 
-### 3. Edici贸n de Transacciones
+### 3. Edición de Transacciones
 
 * Tabla editable de transacciones (CRUD).
-* Formulario para a帽adir nuevas transacciones: activo, tipo, fecha, moneda, precio, gasto, etc.
-* Importaci贸n desde Excel.
-* Ordenaci贸n por cualquier columna.
+* Formulario para añadir nuevas transacciones: activo, tipo, fecha, moneda, precio, gasto, etc.
+* Importación desde Excel.
+* Ordenación por cualquier columna.
 
 ### 4. Persistencia
 
 * Todas las carteras, transacciones y activos se guardan localmente (formato CSV).
-* Sistema de cach茅 para NAVs (por nombre o ISIN) por fuente.
+* Sistema de caché para NAVs (por nombre o ISIN) por fuente.
 
 ---
 
-## 馃敆 Fuentes de Datos
+## 🔗 Fuentes de Datos
 
-| Fuente                       | Tipo de activos soportados                  | M茅todo       | Prioridad | Calidad     |
+| Fuente                       | Tipo de activos soportados                  | Método       | Prioridad | Calidad     |
 | ---------------------------- | ------------------------------------------- | ------------ | --------- | ----------- |
-| **Morningstar.es**           | Fondos UCITS, PPS espa帽oles                 | Scraping     | 馃 Alta    | Muy alta    |
-| **FT.com (Financial Times)**| Fondos UCITS internacionales                | Scraping     | 馃 Media   | Alta        |
-| **Investing.com**            | Fondos UCITS, gr谩ficos                      | Scraping     | 馃 Baja    | Media       |
-| **FundAPI.io**               | Fondos UCITS europeos (ISIN, VL, categor铆a) | API          | Secundaria| Alta        |
-| **CNMV**                     | Fondos y PPS registrados en Espa帽a          | Scraping     | Backup    | Alta        |
+| **Morningstar.es**           | Fondos UCITS, PPS españoles                 | Scraping     | 🥇 Alta    | Muy alta    |
+| **FT.com (Financial Times)**| Fondos UCITS internacionales                | Scraping     | 🥈 Media   | Alta        |
+| **Investing.com**            | Fondos UCITS, gráficos                      | Scraping     | 🥉 Baja    | Media       |
+| **FundAPI.io**               | Fondos UCITS europeos (ISIN, VL, categoría) | API          | Secundaria| Alta        |
+| **CNMV**                     | Fondos y PPS registrados en España          | Scraping     | Backup    | Alta        |
 | **Yahoo Finance (yfinance)** | Acciones, ETFs, algunos fondos              | Python       | Opcional  | Inconsistente|
 
-* El sistema selecciona autom谩ticamente el mejor dato entre las fuentes seg煤n calidad y disponibilidad.
-* Las tasas de cambio hist贸ricas se consultan mediante API (ECB, Open Exchange Rates) y se almacenan en cada transacci贸n.
+* El sistema selecciona automáticamente el mejor dato entre las fuentes según calidad y disponibilidad.
+* Las tasas de cambio históricas se consultan mediante API (ECB, Open Exchange Rates) y se almacenan en cada transacción.
 
 ---
 
-## 馃搮 Tecnolog铆as utilizadas
+## 📅 Tecnologías utilizadas
 
-### Backend / L贸gica:
+### Backend / Lógica:
 
 * Python 3.10+
 * Pandas, Numpy
 * Requests, BeautifulSoup4, Unidecode
-* M贸dulos de scraping personalizados
+* Módulos de scraping personalizados
 * CSV para persistencia local
 
 ### Frontend / Interfaz:
 
 * Streamlit
 * streamlit-aggrid (para tablas interactivas)
-* Matplotlib o Plotly para gr谩ficas
+* Matplotlib o Plotly para gráficas
 
 ---
 
-## 馃洜锔?Arquitectura de archivos
+## 🛠️ Arquitectura de archivos
 
 ```
 cartera_streamlit/
 |
-鈹溾攢鈹€ data/
-鈹?  鈹溾攢鈹€ transacciones/            # CSV por cartera
-鈹?  鈹斺攢鈹€ cache_nav_*.json          # Cache por fuente
+├── data/
+│   ├── transacciones/            # CSV por cartera
+│   └── cache_nav_*.json          # Cache por fuente
 |
-鈹溾攢鈹€ main.py                       # Punto de entrada Streamlit
-鈹溾攢鈹€ utils/
-鈹?  鈹溾攢鈹€ data_loader.py            # Lectura/escritura de carteras
-鈹?  鈹溾攢鈹€ nav_fetcher.py            # Funci贸n unificada get_nav_real
-鈹?  鈹溾攢鈹€ investing_fetcher.py      # Scraper de Investing.com
-鈹?  鈹溾攢鈹€ morningstar_fetcher.py    # Scraper de Morningstar.es
-鈹?  鈹溾攢鈹€ ft_fetcher.py             # Scraper de FT.com
-鈹?  鈹溾攢鈹€ merge_nav_data.py         # L贸gica de fusi贸n de NAVs
-鈹?  鈹溾攢鈹€ ganancias.py              # C谩lculo de ganancia/p茅rdida
-鈹?  鈹溾攢鈹€ general.py                # Estado actual de la cartera
-鈹?  鈹斺攢鈹€ rentabilidad.py           # Rentabilidad por periodo
+├── main.py                       # Punto de entrada Streamlit
+├── utils/
+│   ├── data_loader.py            # Lectura/escritura de carteras
+│   ├── nav_fetcher.py            # Función unificada get_nav_real
+│   ├── investing_fetcher.py      # Scraper de Investing.com
+│   ├── morningstar_fetcher.py    # Scraper de Morningstar.es
+│   ├── ft_fetcher.py             # Scraper de FT.com
+│   ├── merge_nav_data.py         # Lógica de fusión de NAVs
+│   ├── ganancias.py              # Cálculo de ganancia/pérdida
+│   ├── general.py                # Estado actual de la cartera
+│   └── rentabilidad.py           # Rentabilidad por periodo
 ```
 
 ---
 
-## 馃殌 Roadmap futuro
 
-* [ ] M贸dulo de dividendos
-* [ ] M贸dulo de splits
-* [ ] M贸dulo de transacciones recurrentes
-* [ ] C谩lculo fiscal con compensaci贸n de plusval铆as/minusval铆as
+---
+
+## ✅ Novedades recientes 
+
+### 🔁 Gestión Inteligente de NAVs y Cacheo
+
+* Búsqueda por nombre o ISIN con fusión de múltiples fuentes.
+* Cacheo local (`cache_nav_real.json`) con control de expiración.
+* Scrapers independientes para Morningstar, FT y Investing.
+* Algoritmo de validación cruzada (`merge_nav_data`) que prioriza calidad del dato (NAV, fecha, divisa, variación).
+
+### 🧠 Enriquecimiento Automático de Transacciones
+
+* Detección y asignación automática del ISIN por nombre del activo si no está presente.
+* Persistencia de ISINs nuevos en caché tras edición o importación.
+* Formulario de nueva transacción con validación y sugerencias.
+
+### 📊 Rentabilidad y Ganancias Realistas
+
+* Cálculo de NAV actual y comparación con histórico de compra.
+* Ganancia/pérdida total por activo, % sobre desembolso, reembolsos y valoración de mercado.
+* Rentabilidad ponderada por NAV y fecha.
+
+### 🛡️ Validaciones y Manejo de Errores
+
+* Validación defensiva del CSV de transacciones: columnas requeridas, fechas, estructura.
+* Mensajes informativos en consola y Streamlit ante errores de scraping, parsing o estructura.
+
+### 🔍 Trazabilidad y Depuración
+
+* Consola detallada con trazas de llamadas a `merge_nav_data` (útil para debugging).
+* Respuestas distintas si se busca por ISIN vs. nombre.
+* Etiqueta fuente NAV (`Morningstar`, `FT`, `Investing`, etc.) visible.
+
+---
+## 🚀 Roadmap futuro
+
+* [ ] Módulo de dividendos
+* [ ] Módulo de splits
+* [ ] Módulo de transacciones recurrentes
+* [ ] Cálculo fiscal con compensación de plusvalías/minusvalías
 * [ ] Login de usuario y encriptado local
 * [ ] Paso a entorno cloud (Streamlit Sharing, Docker, etc.)
-* [ ] Soporte multimoneda con hist贸rico
-* [ ] Control de calidad de fuentes y auditor铆a de cambios de NAV
+* [ ] Soporte multimoneda con histórico
+* [ ] Control de calidad de fuentes y auditoría de cambios de NAV
