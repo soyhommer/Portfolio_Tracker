@@ -1,0 +1,172 @@
+{
+  "ES0112611001": {
+    "nombre": "Azvalor Internacional FI",
+    "isin": "ES0112611001",
+    "nav": 232.45,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": -0.96,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "ES0114638036": {
+    "nombre": "Bestinver Internacional FI",
+    "isin": "ES0114638036",
+    "nav": 63.58,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 1.81,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "ES0182527038": {
+    "nombre": "Cartesio Y FI",
+    "isin": "ES0182527038",
+    "nav": 3352.51,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 0.5,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "ES0124037005": {
+    "nombre": "Cobas Selección C FI",
+    "isin": "ES0124037005",
+    "nav": 143.78,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": -0.14,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "LU0690375182": {
+    "nombre": "Fundsmith Equity Fund T EUR Acc",
+    "isin": "LU0690375182",
+    "nav": 60.52,
+    "fecha": "2025-06-25",
+    "divisa": "EUR",
+    "variacion_1d": -0.04,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "ES0173394034": {
+    "nombre": "Renta 4 Bolsa España R FI",
+    "isin": "ES0173394034",
+    "nav": 48.2,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 0.79,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "IE0031724234": {
+    "nombre": "Seilern World Growth EUR H R",
+    "isin": "IE0031724234",
+    "nav": 337.29,
+    "fecha": "2025-06-25",
+    "divisa": "EUR",
+    "variacion_1d": -0.43,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "IE00B2NXKW18": {
+    "nombre": "Seilern World Growth EUR U R",
+    "isin": "IE00B2NXKW18",
+    "nav": 477.49,
+    "fecha": "2025-06-25",
+    "divisa": "EUR",
+    "variacion_1d": -0.46,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Fundsmith Equity T EUR Acc": {
+    "nombre": "Fundsmith Equity T EUR Acc",
+    "isin": "LU0690375182",
+    "nav": 60.52,
+    "fecha": "2025-06-25",
+    "divisa": "EUR",
+    "variacion_1d": -0.04,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Azvalor Internacional FI": {
+    "nombre": "Azvalor Internacional FI",
+    "isin": "ES0112611001",
+    "nav": 232.45,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": -0.96,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Bestinver Internacional FI": {
+    "nombre": "Bestinver Internacional FI",
+    "isin": "ES0114638036",
+    "nav": 63.58,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 1.81,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Cartesio Y FI": {
+    "nombre": "Cartesio Y FI",
+    "isin": "ES0182527038",
+    "nav": 3352.51,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 0.5,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Cobas Selección C FI": {
+    "nombre": "Cobas Selección C FI",
+    "isin": "ES0124037005",
+    "nav": 143.78,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": -0.14,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Renta 4 Bolsa España R FI": {
+    "nombre": "Renta 4 Bolsa España R FI",
+    "isin": "ES0173394034",
+    "nav": 48.2,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 0.79,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Seilern World Growth EUR H R": {
+    "nombre": "Seilern World Growth EUR H R",
+    "isin": "IE0031724234",
+    "nav": 338.76,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 1.31,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Seilern World Growth EUR U R": {
+    "nombre": "Seilern World Growth EUR U R",
+    "isin": "IE00B2NXKW18",
+    "nav": 479.71,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "variacion_1d": 0.83,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  },
+  "Fundsmith Equity Fund T EUR Acc": {
+    "nombre": "Fundsmith Equity Fund T EUR Acc",
+    "isin": "LU0690375182",
+    "nav": 60.52,
+    "fecha": "2025-06-25",
+    "divisa": "EUR",
+    "variacion_1d": -0.04,
+    "fuente": "morningstar",
+    "fuente_variacion": "morningstar"
+  }
+}

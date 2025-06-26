@@ -1,0 +1,170 @@
+{
+  "isin:ie0031724234": {
+    "timestamp": "2025-06-26T17:24:08.863266",
+    "data": {
+      "nombre": "Seilern World Growth EUR H R",
+      "isin": "IE0031724234",
+      "nav": 337.29,
+      "fecha": "2025-06-25",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.43
+    }
+  },
+  "isin:ie00b2nxkw18": {
+    "timestamp": "2025-06-26T17:24:09.594672",
+    "data": {
+      "nombre": "Seilern World Growth EUR U R",
+      "isin": "IE00B2NXKW18",
+      "nav": 477.49,
+      "fecha": "2025-06-25",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.46
+    }
+  },
+  "isin:es0112611001": {
+    "timestamp": "2025-06-26T17:24:07.316223",
+    "data": {
+      "nombre": "Azvalor Internacional FI",
+      "isin": "ES0112611001",
+      "nav": 232.45,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.96
+    }
+  },
+  "nombre:bestinver internacional fi": {
+    "timestamp": "2025-06-26T10:42:42.962146",
+    "data": {
+      "nombre": "Bestinver Internacional FI",
+      "isin": "ES0114638036",
+      "nav": 63.58,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": 1.81
+    }
+  },
+  "nombre:azvalor internacional fi": {
+    "timestamp": "2025-06-26T10:42:41.087968",
+    "data": {
+      "nombre": "Azvalor Internacional FI",
+      "isin": "ES0112611001",
+      "nav": 232.45,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.96
+    }
+  },
+  "nombre:cartesio y fi": {
+    "timestamp": "2025-06-26T10:42:44.636541",
+    "data": {
+      "nombre": "Cartesio Y FI",
+      "isin": "ES0182527038",
+      "nav": 3352.51,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": 0.5
+    }
+  },
+  "nombre:cobas selección c fi": {
+    "timestamp": "2025-06-26T10:42:46.205665",
+    "data": {
+      "nombre": "Cobas Selección C FI",
+      "isin": "ES0124037005",
+      "nav": 143.78,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.14
+    }
+  },
+  "nombre:fundsmith equity t eur acc": {
+    "timestamp": "2025-06-26T10:54:14.563605",
+    "data": {
+      "nombre": "Fundsmith Equity Fund T EUR Acc",
+      "isin": "LU0690375182",
+      "nav": 60.52,
+      "fecha": "2025-06-25",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.04
+    }
+  },
+  "nombre:renta 4 bolsa españa r fi": {
+    "timestamp": "2025-06-26T10:42:49.526916",
+    "data": {
+      "nombre": "Renta 4 Bolsa España R FI",
+      "isin": "ES0173394034",
+      "nav": 48.2,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": 0.79
+    }
+  },
+  "isin:es0114638036": {
+    "timestamp": "2025-06-26T17:24:06.974019",
+    "data": {
+      "nombre": "Bestinver Internacional FI",
+      "isin": "ES0114638036",
+      "nav": 63.58,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": 1.81
+    }
+  },
+  "isin:es0182527038": {
+    "timestamp": "2025-06-26T17:24:07.751321",
+    "data": {
+      "nombre": "Cartesio Y FI",
+      "isin": "ES0182527038",
+      "nav": 3352.51,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": 0.5
+    }
+  },
+  "isin:es0124037005": {
+    "timestamp": "2025-06-26T17:24:08.143917",
+    "data": {
+      "nombre": "Cobas Selección C FI",
+      "isin": "ES0124037005",
+      "nav": 143.78,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.14
+    }
+  },
+  "isin:lu0690375182": {
+    "timestamp": "2025-06-26T17:24:08.470108",
+    "data": {
+      "nombre": "Fundsmith Equity Fund T EUR Acc",
+      "isin": "LU0690375182",
+      "nav": 60.52,
+      "fecha": "2025-06-25",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": -0.04
+    }
+  },
+  "isin:es0173394034": {
+    "timestamp": "2025-06-26T17:24:09.227358",
+    "data": {
+      "nombre": "Renta 4 Bolsa España R FI",
+      "isin": "ES0173394034",
+      "nav": 48.2,
+      "fecha": "2025-06-24",
+      "divisa": "EUR",
+      "fuente": "Morningstar.es",
+      "variacion_1d": 0.79
+    }
+  }
+}

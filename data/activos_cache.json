@@ -1,0 +1,51 @@
+{
+  "SIM-AZVALOR": {
+    "nombre": "Azvalor Internacional FI",
+    "nav": 80.3792,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  },
+  "SIM-BESTINVE": {
+    "nombre": "Bestinver Internacional FI",
+    "nav": 93.4376,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  },
+  "SIM-CARTESIO": {
+    "nombre": "Cartesio Y FI",
+    "nav": 104.8679,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  },
+  "SIM-COBASSE": {
+    "nombre": "Cobas Selección C FI",
+    "nav": 84.3504,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  },
+  "SIM-FUNDSMIT": {
+    "nombre": "Fundsmith Equity T EUR Acc",
+    "nav": 138.7204,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  },
+  "SIM-RENTA4": {
+    "nombre": "Renta 4 Bolsa España R FI",
+    "nav": 122.1407,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  },
+  "SIM-SEILERN": {
+    "nombre": "Seilern World Growth EUR U FI",
+    "nav": 149.2255,
+    "fecha": "2025-06-24",
+    "divisa": "EUR",
+    "fuente": "Simulado"
+  }
+}
