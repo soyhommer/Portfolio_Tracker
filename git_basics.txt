@@ -1,17 +1,6 @@
 #Para traer actualizaciones del remoto:
 git pull origin main
 
-#Commit
-git commit -m "Mensaje"
-
-#Push
-git push
-
-#Para subir tus cambios haciendo commit:
-git add .
-git commit -m "Tu mensaje de commit"
-git push origin main
-
 #ver cambios
 git status
 
@@ -20,4 +9,20 @@ git diff archivo
 
 #Añadir solo lo deseado
 git add archivo
+
+#Añadir todo lo modificado
+git add .
+
+#Confirmar modifiación - Commit
+git commit -m "Mensaje"
+
+#Sincronizar con repositorio principal - Push
+git push
+
+#Para subir tus cambios haciendo commit:
+git add .
+git commit -m "Tu mensaje de commit"
+git push origin main
+
+
 

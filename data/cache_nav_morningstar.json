@@ -1,30 +1,30 @@
 {
   "isin:ie0031724234": {
-    "timestamp": "2025-06-27T10:02:19.533940",
+    "timestamp": "2025-06-27T13:35:06.512091",
     "data": {
       "nombre": "Seilern World Growth EUR H R",
       "isin": "IE0031724234",
-      "nav": 337.29,
-      "fecha": "2025-06-25",
+      "nav": 337.96,
+      "fecha": "2025-06-26",
       "divisa": "EUR",
       "fuente": "Morningstar.es",
-      "variacion_1d": -0.43
+      "variacion_1d": 0.2
     }
   },
   "isin:ie00b2nxkw18": {
-    "timestamp": "2025-06-27T10:02:21.198756",
+    "timestamp": "2025-06-27T13:35:07.207997",
     "data": {
       "nombre": "Seilern World Growth EUR U R",
       "isin": "IE00B2NXKW18",
-      "nav": 477.49,
-      "fecha": "2025-06-25",
+      "nav": 476.14,
+      "fecha": "2025-06-26",
       "divisa": "EUR",
       "fuente": "Morningstar.es",
-      "variacion_1d": -0.46
+      "variacion_1d": -0.28
     }
   },
   "isin:es0112611001": {
-    "timestamp": "2025-06-27T10:02:17.072524",
+    "timestamp": "2025-06-27T13:35:04.775756",
     "data": {
       "nombre": "Azvalor Internacional FI",
       "isin": "ES0112611001",
@@ -108,7 +108,7 @@
     }
   },
   "isin:es0114638036": {
-    "timestamp": "2025-06-27T10:02:16.670999",
+    "timestamp": "2025-06-27T13:35:04.284191",
     "data": {
       "nombre": "Bestinver Internacional FI",
       "isin": "ES0114638036",
@@ -120,7 +120,7 @@
     }
   },
   "isin:es0182527038": {
-    "timestamp": "2025-06-27T10:02:18.285213",
+    "timestamp": "2025-06-27T13:35:05.137700",
     "data": {
       "nombre": "Cartesio Y FI",
       "isin": "ES0182527038",
@@ -132,7 +132,7 @@
     }
   },
   "isin:es0124037005": {
-    "timestamp": "2025-06-27T10:02:18.709920",
+    "timestamp": "2025-06-27T13:35:05.555616",
     "data": {
       "nombre": "Cobas Selección C FI",
       "isin": "ES0124037005",
@@ -144,7 +144,7 @@
     }
   },
   "isin:lu0690375182": {
-    "timestamp": "2025-06-27T10:02:19.125598",
+    "timestamp": "2025-06-27T13:35:05.996430",
     "data": {
       "nombre": "Fundsmith Equity Fund T EUR Acc",
       "isin": "LU0690375182",
@@ -156,7 +156,7 @@
     }
   },
   "isin:es0173394034": {
-    "timestamp": "2025-06-27T10:02:20.814033",
+    "timestamp": "2025-06-27T13:35:06.882218",
     "data": {
       "nombre": "Renta 4 Bolsa España R FI",
       "isin": "ES0173394034",

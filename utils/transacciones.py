@@ -48,6 +48,8 @@ def mostrar_tabla_transacciones(cartera):
     df = limpiar_isin(df)
     validar_isin_vs_nombre(df)
 
+
+
     # Validación defensiva de columna clave
     if "Posición" not in df.columns:
         st.error("❌ No se encuentra la columna 'Posición' en el archivo de transacciones.")
@@ -83,16 +85,43 @@ def mostrar_tabla_transacciones(cartera):
         cols.insert(cols.index("Posición") + 1, cols.pop(cols.index("ISIN")))
         df = df[cols]
 
+    # df_editado = st.data_editor(
+        # df,
+        # use_container_width=True,
+        # num_rows="dynamic",
+        # column_config={
+            # "Fecha": st.column_config.DateColumn(format="YYYY-MM-DD"),
+            # "Moneda": st.column_config.SelectboxColumn(
+                # "Moneda", options=["EUR", "USD", "GBP", "CHF", "JPY"]
+            # ),
+            # "Tipo": st.column_config.SelectboxColumn(
+                # "Tipo", options=["Compra", "Venta", "Venta total"]
+            # ),
+        # },
+    # )
+
     df_editado = st.data_editor(
         df,
         use_container_width=True,
-        num_rows="dynamic",
         column_config={
-            "Fecha": st.column_config.DateColumn(format="YYYY-MM-DD"),
-            "Moneda": st.column_config.SelectboxColumn("Moneda", options=["EUR", "USD", "GBP", "CHF", "JPY"]),
-            "Tipo": st.column_config.SelectboxColumn("Tipo", options=["Compra", "Venta", "Venta total"]),
+            "Fecha": st.column_config.DateColumn(
+                label="Fecha",
+                format="YYYY-MM-DD",
+                required=True
+            ),
+            "Moneda": st.column_config.SelectboxColumn(
+                label="Moneda",
+                options=["EUR", "USD", "GBP", "CHF", "JPY"],
+                required=True
+            ),
+            "Tipo": st.column_config.SelectboxColumn(
+                label="Tipo",
+                options=["Compra", "Venta", "Venta total"],
+                required=True
+            ),
         },
     )
+
 
     if st.button("💾 Guardar cambios en transacciones"):
         guardar_transacciones(cartera, df_editado)

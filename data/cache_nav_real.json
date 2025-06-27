@@ -62,20 +62,20 @@
   "IE0031724234": {
     "nombre": "Seilern World Growth EUR H R",
     "isin": "IE0031724234",
-    "nav": 337.29,
-    "fecha": "2025-06-25",
+    "nav": 337.96,
+    "fecha": "2025-06-26",
     "divisa": "EUR",
-    "variacion_1d": -0.43,
+    "variacion_1d": 0.2,
     "fuente": "morningstar",
     "fuente_variacion": "morningstar"
   },
   "IE00B2NXKW18": {
     "nombre": "Seilern World Growth EUR U R",
     "isin": "IE00B2NXKW18",
-    "nav": 477.49,
-    "fecha": "2025-06-25",
+    "nav": 476.14,
+    "fecha": "2025-06-26",
     "divisa": "EUR",
-    "variacion_1d": -0.46,
+    "variacion_1d": -0.28,
     "fuente": "morningstar",
     "fuente_variacion": "morningstar"
   },
