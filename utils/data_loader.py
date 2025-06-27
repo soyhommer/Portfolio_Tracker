@@ -3,6 +3,7 @@ import json
 import shutil
 import streamlit as st
 import pandas as pd
+from utils.config import CARTERAS_PATH
 
 DATA_DIR = "data"
 CARTERAS_FILE = os.path.join(DATA_DIR, "carteras.json")
@@ -10,7 +11,7 @@ TRANSACCIONES_DIR = os.path.join(DATA_DIR, "transacciones")
 
 def cargar_carteras():
     if not os.path.exists(CARTERAS_FILE):
-        return []
+        return {}
     with open(CARTERAS_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -104,17 +105,28 @@ def crear_cartera_si_necesario():
 
 def renombrar_cartera(nombre_antiguo, nombre_nuevo):
     try:
-        # Leer carteras
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+        # Leer carteras (esperado: lista de nombres)
+        with open(CARTERAS_PATH, "r", encoding="utf-8") as f:
             carteras = json.load(f)
 
-        # Reemplazar el nombre
-        if nombre_antiguo not in carteras:
+        if not isinstance(carteras, list):
+            print("⚠️ Error: carteras.json debe ser una lista de nombres.")
             return False
-        carteras[nombre_nuevo] = carteras.pop(nombre_antiguo)
 
-        # Guardar
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+        if nombre_antiguo not in carteras:
+            print(f"⚠️ La cartera '{nombre_antiguo}' no existe.")
+            return False
+
+        if nombre_nuevo in carteras:
+            print(f"⚠️ La cartera '{nombre_nuevo}' ya existe.")
+            return False
+
+        # Reemplazar nombre en la lista
+        idx = carteras.index(nombre_antiguo)
+        carteras[idx] = nombre_nuevo
+
+        # Guardar lista actualizada
+        with open(CARTERAS_PATH, "w", encoding="utf-8") as f:
             json.dump(carteras, f, indent=2, ensure_ascii=False)
 
         # Renombrar archivo de transacciones si existe
@@ -122,20 +134,22 @@ def renombrar_cartera(nombre_antiguo, nombre_nuevo):
         archivo_nuevo = os.path.join(TRANSACCIONES_DIR, f"{nombre_nuevo}.csv")
         if os.path.exists(archivo_antiguo):
             shutil.move(archivo_antiguo, archivo_nuevo)
+            print(f"✅ Archivo de transacciones renombrado a '{archivo_nuevo}'.")
 
         return True
+
     except Exception as e:
         print(f"⚠️ Error al renombrar cartera: {e}")
         return False
         
 def eliminar_cartera(nombre):
     try:
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+        with open(CARTERAS_PATH, "r", encoding="utf-8") as f:
             carteras = json.load(f)
 
         if nombre in carteras:
             del carteras[nombre]
-            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            with open(CARTERAS_PATH, "w", encoding="utf-8") as f:
                 json.dump(carteras, f, indent=2, ensure_ascii=False)
 
         archivo_csv = os.path.join(TRANSACCIONES_DIR, f"{nombre}.csv")

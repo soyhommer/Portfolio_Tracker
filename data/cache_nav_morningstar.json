@@ -1,6 +1,6 @@
 {
   "isin:ie0031724234": {
-    "timestamp": "2025-06-27T13:35:06.512091",
+    "timestamp": "2025-06-27T15:55:21.524089",
     "data": {
       "nombre": "Seilern World Growth EUR H R",
       "isin": "IE0031724234",
@@ -12,7 +12,7 @@
     }
   },
   "isin:ie00b2nxkw18": {
-    "timestamp": "2025-06-27T13:35:07.207997",
+    "timestamp": "2025-06-27T15:55:22.534573",
     "data": {
       "nombre": "Seilern World Growth EUR U R",
       "isin": "IE00B2NXKW18",
@@ -24,7 +24,7 @@
     }
   },
   "isin:es0112611001": {
-    "timestamp": "2025-06-27T13:35:04.775756",
+    "timestamp": "2025-06-27T15:55:19.768099",
     "data": {
       "nombre": "Azvalor Internacional FI",
       "isin": "ES0112611001",
@@ -108,7 +108,7 @@
     }
   },
   "isin:es0114638036": {
-    "timestamp": "2025-06-27T13:35:04.284191",
+    "timestamp": "2025-06-27T15:55:19.375363",
     "data": {
       "nombre": "Bestinver Internacional FI",
       "isin": "ES0114638036",
@@ -120,7 +120,7 @@
     }
   },
   "isin:es0182527038": {
-    "timestamp": "2025-06-27T13:35:05.137700",
+    "timestamp": "2025-06-27T15:55:20.112964",
     "data": {
       "nombre": "Cartesio Y FI",
       "isin": "ES0182527038",
@@ -132,7 +132,7 @@
     }
   },
   "isin:es0124037005": {
-    "timestamp": "2025-06-27T13:35:05.555616",
+    "timestamp": "2025-06-27T15:55:20.627146",
     "data": {
       "nombre": "Cobas Selección C FI",
       "isin": "ES0124037005",
@@ -144,7 +144,7 @@
     }
   },
   "isin:lu0690375182": {
-    "timestamp": "2025-06-27T13:35:05.996430",
+    "timestamp": "2025-06-27T15:55:21.062343",
     "data": {
       "nombre": "Fundsmith Equity Fund T EUR Acc",
       "isin": "LU0690375182",
@@ -156,7 +156,7 @@
     }
   },
   "isin:es0173394034": {
-    "timestamp": "2025-06-27T13:35:06.882218",
+    "timestamp": "2025-06-27T15:55:21.956699",
     "data": {
       "nombre": "Renta 4 Bolsa España R FI",
       "isin": "ES0173394034",

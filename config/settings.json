@@ -1,8 +1,17 @@
 {
-  "monedas_admitidas": ["EUR", "USD", "GBP"],
-  "benchmarks": ["MSCI World", "S&P 500", "Eurostoxx 50"],
+  "monedas_admitidas": [
+    "EUR",
+    "USD",
+    "GBP"
+  ],
+  "benchmarks": [
+    "MSCI World",
+    "S&P 500",
+    "Eurostoxx 50"
+  ],
   "api_keys": {
     "fundapi": "TU_API_KEY",
     "fmp": "TU_API_KEY"
-  }
+  },
+  "carteras_path": "data/carteras.json"
 }

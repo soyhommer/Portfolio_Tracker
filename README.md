@@ -84,6 +84,31 @@ Aplicación local para el seguimiento y edición de carteras de inversión perso
 
 ---
 
+## 🔧 Instalación y ejecución
+
+1. Crea un entorno virtual de Python (opcional pero recomendado):
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+2. Instala las dependencias necesarias:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Inicia la aplicación con **Streamlit** desde la raíz del proyecto:
+
+   ```bash
+   streamlit run main.py
+   ```
+
+   Esto abrirá el dashboard en tu navegador predeterminado.
+   
+---
+
 ## 🛠️ Arquitectura de archivos
 
 ```
