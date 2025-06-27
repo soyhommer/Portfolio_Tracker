@@ -5,14 +5,11 @@ streamlit
 pandas
 numpy
 requests
-openpyxl
-matplotlib
-plotly
-yfinance
 beautifulsoup4
 lxml
 unidecode
-streamlit-aggrid
+openpyxl
+selenium
 """
 
 with open("requirements.txt", "w") as f:
