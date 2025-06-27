@@ -1,0 +1,19 @@
+# Creamos un archivo requirements.txt con todas las dependencias utilizadas hasta ahora
+
+streamlit
+pandas
+numpy
+requests
+beautifulsoup4
+lxml
+unidecode
+openpyxl
+selenium
+plotly
+
+#with open("requirements.txt", "w") as f:
+#    f.write(requirements.strip())
+
+#"✅ Archivo requirements.txt generado con todas las dependencias actuales del proyecto."
+
+#pip install -r requirements.txt

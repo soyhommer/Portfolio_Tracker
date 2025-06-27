@@ -1,38 +1,38 @@
 {
   "isin:ie00b2nxkw18": {
-    "timestamp": "2025-06-25T19:14:51.505884",
+    "timestamp": "2025-06-27T10:02:21.998093",
     "data": {
       "nombre": "Seilern World Growth EUR U R",
       "isin": "IE00B2NXKW18",
-      "nav": 479.71,
-      "fecha": "2025-06-24",
+      "nav": 477.49,
+      "fecha": "2025-06-25",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.83
+      "variacion_1d": -0.46
     }
   },
   "isin:ie0031724234": {
-    "timestamp": "2025-06-25T19:14:54.420708",
+    "timestamp": "2025-06-27T10:02:20.437991",
     "data": {
       "nombre": "Seilern World Growth EUR H R",
       "isin": "IE0031724234",
-      "nav": 338.76,
-      "fecha": "2025-06-24",
+      "nav": 337.29,
+      "fecha": "2025-06-25",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 1.31
+      "variacion_1d": -0.43
     }
   },
   "isin:es0112611001": {
-    "timestamp": "2025-06-25T19:26:03.750848",
+    "timestamp": "2025-06-27T10:02:17.900240",
     "data": {
       "nombre": "Azvalor Internacional FI",
       "isin": "ES0112611001",
-      "nav": 232.45,
-      "fecha": "2025-06-24",
+      "nav": 230.71,
+      "fecha": "2025-06-25",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": -0.96
+      "variacion_1d": -0.75
     }
   },
   "nombre:bestinver internacional fi": {
