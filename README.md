@@ -109,26 +109,26 @@ Aplicación local para el seguimiento y edición de carteras de inversión perso
    
 ---
 
-## 🛠️ Arquitectura de archivos
+## 🛠�?Arquitectura de archivos
 
 ```
 cartera_streamlit/
 |
 ├── data/
-│   ├── transacciones/            # CSV por cartera
-│   └── cache_nav_*.json          # Cache por fuente
+�?  ├── transacciones/            # CSV por cartera
+�?  └── cache_nav_*.json          # Cache por fuente
 |
 ├── main.py                       # Punto de entrada Streamlit
 ├── utils/
-│   ├── data_loader.py            # Lectura/escritura de carteras
-│   ├── nav_fetcher.py            # Función unificada get_nav_real
-│   ├── investing_fetcher.py      # Scraper de Investing.com
-│   ├── morningstar_fetcher.py    # Scraper de Morningstar.es
-│   ├── ft_fetcher.py             # Scraper de FT.com
-│   ├── merge_nav_data.py         # Lógica de fusión de NAVs
-│   ├── ganancias.py              # Cálculo de ganancia/pérdida
-│   ├── general.py                # Estado actual de la cartera
-│   └── rentabilidad.py           # Rentabilidad por periodo
+�?  ├── data_loader.py            # Lectura/escritura de carteras
+�?  ├── nav_fetcher.py            # Función unificada get_nav_real
+�?  ├── investing_fetcher.py      # Scraper de Investing.com
+�?  ├── morningstar_fetcher.py    # Scraper de Morningstar.es
+�?  ├── ft_fetcher.py             # Scraper de FT.com
+�?  ├── merge_nav_data.py         # Lógica de fusión de NAVs
+�?  ├── ganancias.py              # Cálculo de ganancia/pérdida
+�?  ├── general.py                # Estado actual de la cartera
+�?  └── rentabilidad.py           # Rentabilidad por periodo
 ```
 
 ---
@@ -136,7 +136,7 @@ cartera_streamlit/
 
 ---
 
-## ✅ Novedades recientes 
+## �?Novedades recientes 
 
 ### 🔁 Gestión Inteligente de NAVs y Cacheo
 
@@ -157,7 +157,7 @@ cartera_streamlit/
 * Ganancia/pérdida total por activo, % sobre desembolso, reembolsos y valoración de mercado.
 * Rentabilidad ponderada por NAV y fecha.
 
-### 🛡️ Validaciones y Manejo de Errores
+### 🛡�?Validaciones y Manejo de Errores
 
 * Validación defensiva del CSV de transacciones: columnas requeridas, fechas, estructura.
 * Mensajes informativos en consola y Streamlit ante errores de scraping, parsing o estructura.
@@ -171,6 +171,7 @@ cartera_streamlit/
 ---
 ## 🚀 Roadmap futuro
 
+* [ ] Datos de NAV y rentabilidad por usuario y por cartera
 * [ ] Módulo de dividendos
 * [ ] Módulo de splits
 * [ ] Módulo de transacciones recurrentes
