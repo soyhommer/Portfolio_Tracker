@@ -5,9 +5,10 @@ import streamlit as st
 from utils.nav_fetcher import get_nav_real as get_nav
 from utils.nav_fetcher import cargar_cache_nav
 from utils.nav_cache import actualizar_cache_isin
+from utils.config import TRANSACCIONES_DIR, NAV_HISTORICO_DIR
 
-DATA_DIR = "data"
-TRANSACCIONES_DIR = os.path.join(DATA_DIR, "transacciones")
+# DATA_DIR = "data"
+# TRANSACCIONES_DIR = os.path.join(DATA_DIR, "transacciones")
 
 def obtener_ruta_transacciones(cartera):
     return os.path.join(TRANSACCIONES_DIR, f"{cartera}.csv")
@@ -48,16 +49,13 @@ def mostrar_tabla_transacciones(cartera):
     df = limpiar_isin(df)
     validar_isin_vs_nombre(df)
 
-
-
     # Validación defensiva de columna clave
     if "Posición" not in df.columns:
         st.error("❌ No se encuentra la columna 'Posición' en el archivo de transacciones.")
         return df
 
-    # Si el DataFrame está vacío, se advierte y retorna
     if df.empty:
-        st.warning("La cartera no tiene transacciones registradas.")
+        st.warning("⚠️ La cartera no tiene transacciones registradas.")
         return df
 
     # Asegurar tipo fecha
@@ -69,7 +67,6 @@ def mostrar_tabla_transacciones(cartera):
             lambda x: x.strip().replace("\u200b", "").replace("\u00a0", "") if isinstance(x, str) else x
         ).replace("—", None)
 
-    # Validación de ISIN
     def es_isin_valido(x):
         return isinstance(x, str) and x.strip() != "" and x != "—"
 
@@ -85,24 +82,13 @@ def mostrar_tabla_transacciones(cartera):
         cols.insert(cols.index("Posición") + 1, cols.pop(cols.index("ISIN")))
         df = df[cols]
 
-    # df_editado = st.data_editor(
-        # df,
-        # use_container_width=True,
-        # num_rows="dynamic",
-        # column_config={
-            # "Fecha": st.column_config.DateColumn(format="YYYY-MM-DD"),
-            # "Moneda": st.column_config.SelectboxColumn(
-                # "Moneda", options=["EUR", "USD", "GBP", "CHF", "JPY"]
-            # ),
-            # "Tipo": st.column_config.SelectboxColumn(
-                # "Tipo", options=["Compra", "Venta", "Venta total"]
-            # ),
-        # },
-    # )
+    st.markdown("**✔️ Edita directamente las transacciones. Puedes borrar filas con el icono 🗑️ de la tabla:**")
 
+    # ✅ Editable table with sortable columns
     df_editado = st.data_editor(
         df,
         use_container_width=True,
+        num_rows="dynamic",
         column_config={
             "Fecha": st.column_config.DateColumn(
                 label="Fecha",
@@ -122,7 +108,6 @@ def mostrar_tabla_transacciones(cartera):
         },
     )
 
-
     if st.button("💾 Guardar cambios en transacciones"):
         guardar_transacciones(cartera, df_editado)
 
@@ -132,10 +117,12 @@ def mostrar_tabla_transacciones(cartera):
             if isinstance(nombre, str) and isinstance(isin, str) and isin.strip() and isin != "—":
                 actualizar_cache_isin(nombre, isin)
 
-        st.success("Cambios guardados correctamente.")
+        st.success("✅ Cambios guardados correctamente.")
         st.rerun()
 
     return df
+
+
 
 def formulario_nueva_transaccion(cartera):
     st.markdown("---")
@@ -143,43 +130,65 @@ def formulario_nueva_transaccion(cartera):
 
     df = cargar_transacciones(cartera)
 
-    # # ✅ Diagnóstico de ISIN en fondos Seilern
-    # def es_isin_valido(x):
-        # if not isinstance(x, str):
-            # return False
-        # x = x.strip().replace("\u200b", "").replace("\u00a0", "")
-        # return bool(re.fullmatch(r"[A-Z]{2}[A-Z0-9]{10}", x))
-
-    # diagnostico = []
-    # for index, row in df.iterrows():
-        # isin = row.get("ISIN")
-        # if isin and "Seilern" in row["Posición"]:
-            # valido = es_isin_valido(isin)
-            # diagnostico.append(f"[{row['Posición']}]: ISIN='{isin}' → válido={valido} → repr: {repr(isin)}")
-
-    # if diagnostico:
-        # st.markdown("### 🔍 Diagnóstico ISIN fondos Seilern")
-        # st.code("\n".join(diagnostico))
-
-    # ✅ Formulario Streamlit
     with st.form(key="form_transaccion"):
         col1, col2, col3 = st.columns(3)
+
         with col1:
-            posicion = st.text_input("Posición (nombre, ISIN, ticker)")
+            identificador = st.text_input(
+                "ISIN / Ticker / Código",
+                help="Código identificativo del activo (ISIN, Ticker u otro). Se guardará en la columna ISIN."
+            )
             tipo = st.selectbox("Tipo", ["Compra", "Venta", "Venta total"])
+
         with col2:
+            nombre = st.text_input(
+                "Nombre del activo",
+                help="Nombre del fondo, acción, PP, ETF, etc. Se guardará en la columna Posición. Si se deja vacío se intentará autocompletar desde históricos o consultar online."
+            )
             participaciones = st.number_input("Participaciones", min_value=0.0001, format="%.4f")
             fecha = st.date_input("Fecha")
+
         with col3:
-            moneda = st.selectbox("Moneda", ["EUR", "USD", "GBP"])
-            precio = st.number_input("Precio unitario", min_value=0.0001, format="%.4f")
+            moneda = st.selectbox("Moneda", ["EUR", "USD", "GBP", "CHF", "JPY"])
+            precio = st.number_input(
+                "Precio unitario",
+                min_value=0.0,
+                value=0.0,
+                format="%.4f",
+                help="Si se deja en 0 se intentará completar automáticamente con el histórico NAV."
+            )
             gasto = st.number_input("Gasto (opcional)", min_value=0.0, format="%.2f", value=0.0)
 
         submitted = st.form_submit_button("Añadir transacción")
 
         if submitted:
+            # Validación mínima del identificador
+            if not identificador.strip():
+                st.error("❌ El campo ISIN / Ticker / Código es obligatorio.")
+                return
+
+            # Autocompletar NOMBRE si está vacío
+            if not nombre.strip():
+                datos_nav = get_nav(identificador)
+                if datos_nav and "nombre" in datos_nav:
+                    nombre = datos_nav["nombre"]
+                    st.success(f"✔️ Nombre del activo autocompletado: {nombre}")
+                else:
+                    st.warning("⚠️ No se pudo autocompletar el nombre del activo. Por favor complétalo manualmente si puedes.")
+
+            # Autocompletar PRECIO si está en 0
+            if precio == 0.0:
+                precio_nav = buscar_nav_para_transaccion(identificador, fecha, NAV_HISTORICO_DIR)
+                if precio_nav is not None:
+                    precio = precio_nav
+                    st.success(f"✔️ Precio unitario autocompletado desde histórico NAV: {precio:.4f}")
+                else:
+                    st.warning("⚠️ No se encontró NAV en históricos para este activo y fecha. Precio dejado en 0.")
+
+            # Construir registro alineado con el esquema EXISTENTE del CSV
             nueva = {
-                "Posición": posicion,
+                "Posición": nombre,
+                "ISIN": identificador,
                 "Tipo": tipo,
                 "Participaciones": participaciones,
                 "Fecha": fecha,
@@ -188,16 +197,38 @@ def formulario_nueva_transaccion(cartera):
                 "Gasto": gasto
             }
 
+            # Añadir al dataframe
             df = pd.concat([df, pd.DataFrame([nueva])], ignore_index=True)
-            
+
+            # Limpieza y validación de ISIN
             from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
             df = limpiar_isin(df)
             validar_isin_vs_nombre(df)
-            
+
+            # Guardar
             guardar_transacciones(cartera, df)
 
-            st.success("Transacción añadida correctamente.")
+            st.success("✅ Transacción añadida correctamente.")
             st.rerun()
+
+
+def buscar_nav_para_transaccion(isin, fecha, nav_historico_dir):
+    """
+    Busca en el histórico NAV el valor para un ISIN en la fecha dada.
+    Devuelve el Price si se encuentra, o None.
+    """
+    try:
+        path = nav_historico_dir / f"{isin}.csv"
+        if not path.exists():
+            return None
+        df = pd.read_csv(path)
+        df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
+        match = df[df["Date"] == pd.to_datetime(fecha)]
+        if not match.empty:
+            return match.iloc[0]["Price"]
+    except Exception as e:
+        print(f"Error buscando NAV: {e}")
+    return None
             
 def importar_transacciones_excel(cartera):
     st.markdown("---")

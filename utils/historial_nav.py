@@ -4,13 +4,14 @@ import pandas as pd
 from pathlib import Path
 import streamlit as st
 from utils.investing_fetcher import buscar_nav_investing
+from utils.config import NAV_HISTORICO_DIR, TRANSACCIONES_DIR, CACHE_NOMBRE_PATH
 
-# Ruta del directorio compartido de históricos
-NAV_HISTORICO_DIR = Path("data/nav_historico")
-NAV_HISTORICO_DIR.mkdir(parents=True, exist_ok=True)
-CACHE_NOMBRE_PATH = NAV_HISTORICO_DIR / "cache_nombre_activo.json"
-TRANSACCIONES_DIR = Path("data/transacciones")
-TRANSACCIONES_DIR.mkdir(parents=True, exist_ok=True)
+# # Ruta del directorio compartido de históricos
+# NAV_HISTORICO_DIR = Path("data/nav_historico")
+# NAV_HISTORICO_DIR.mkdir(parents=True, exist_ok=True)
+# CACHE_NOMBRE_PATH = NAV_HISTORICO_DIR / "cache_nombre_activo.json"
+# TRANSACCIONES_DIR = Path("data/transacciones")
+# TRANSACCIONES_DIR.mkdir(parents=True, exist_ok=True)
 
 def leer_csv_investing(file) -> pd.DataFrame:
     """
