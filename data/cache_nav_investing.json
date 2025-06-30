@@ -106,5 +106,17 @@
       "fuente": "Investing.com",
       "variacion_1d": 0.79
     }
+  },
+  "isin:es0116567035": {
+    "timestamp": "2025-06-30T18:48:39.296138",
+    "data": {
+      "nombre": "Cartesio X Fi (116567035)",
+      "isin": "ES0116567035",
+      "nav": 2.38578,
+      "fecha": "2025-06-27",
+      "divisa": "EUR",
+      "fuente": "Investing.com",
+      "variacion_1d": 0.06
+    }
   }
 }

@@ -40,7 +40,7 @@ else:
 crear_cartera_si_necesario()
 
 # Navegación entre pestañas
-menu = st.sidebar.radio("Navegar a:", ["General", "Rentabilidad", "Ganancias / Pérdidas", "Flujos", "Transacciones"])
+menu = st.sidebar.radio("Navegar a:", ["General", "Rentabilidad", "Ganancias / Pérdidas", "Flujos", "Transacciones", "Cargar Históricos NAV"])
 
 if menu == "General":
     st.subheader(f"Resumen general - {cartera_activa}")
@@ -105,3 +105,7 @@ elif menu == "Transacciones":
         importar_transacciones_excel(st.session_state["cartera"])
     else:
         st.warning("Selecciona una cartera para trabajar con transacciones.")
+
+elif menu == "Cargar Históricos NAV":
+    st.subheader("Cargar Históricos NAV")
+    mostrar_gestor_historicos_nav()
