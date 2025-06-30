@@ -11,6 +11,7 @@ from utils.evolucion import mostrar_evolucion_valor_cartera
 from utils.benchmark import comparar_con_benchmark
 from utils.config import CACHE_TTL_HORAS
 from utils.formatting import mostrar_dataframe_formateado
+from utils.historial_nav import mostrar_gestor_historicos_nav
 
 # Configuración inicial
 st.set_page_config(page_title="Gestor de Carteras", layout="wide")
