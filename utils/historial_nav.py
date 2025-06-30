@@ -326,7 +326,25 @@ def mostrar_gestor_historicos_nav():
     de forma incremental sin perder datos ya cargados.
     """)
 
+    # 6️⃣ Revisión de cobertura NAV
+    st.markdown("---")
+    st.header("📊 Revisión de Cobertura NAV")
+
+    # Ejecuta la revisión
+    faltantes_df = detectar_faltantes_nav_por_cartera(TRANSACCIONES_DIR, NAV_HISTORICO_DIR)
+
+    if not faltantes_df.empty:
+        st.warning("⚠️ Hay transacciones en carteras que NO están cubiertas por históricos NAV:")
+        st.dataframe(faltantes_df, use_container_width=True)
+        st.markdown("""
+            ✅ Por favor revisa estas fechas e ISINs y sube los históricos faltantes 
+            para poder calcular correctamente las rentabilidades.
+        """)
+    else:
+        st.success("✅ Todas las transacciones de todas las carteras están cubiertas con datos NAV disponibles.")
+
     # 0️⃣ Resumen de ISINs ya cargados en el sistema
+    st.markdown("---")
     df_resumen = resumen_historicos_cargados()
 
     st.subheader("📋 ISINs ya cargados en el sistema")
@@ -384,19 +402,4 @@ def mostrar_gestor_historicos_nav():
             st.success(f"✅ Histórico actualizado para ISIN: {isin_final}")
             st.rerun()
 
-    # 6️⃣ Revisión de cobertura NAV
-    st.markdown("---")
-    st.header("📊 Revisión de Cobertura NAV")
-
-    # Ejecuta la revisión
-    faltantes_df = detectar_faltantes_nav_por_cartera(TRANSACCIONES_DIR, NAV_HISTORICO_DIR)
-
-    if not faltantes_df.empty:
-        st.warning("⚠️ Hay transacciones en carteras que NO están cubiertas por históricos NAV:")
-        st.dataframe(faltantes_df, use_container_width=True)
-        st.markdown("""
-            ✅ Por favor revisa estas fechas e ISINs y sube los históricos faltantes 
-            para poder calcular correctamente las rentabilidades.
-        """)
-    else:
-        st.success("✅ Todas las transacciones de todas las carteras están cubiertas con datos NAV disponibles.")
+   
