@@ -173,6 +173,20 @@ cartera_streamlit/
 - Decimal `,` soportado automáticamente.
 - Separador de columnas `;`.
 
+### 📈 Mejoras en el módulo de Rentabilidades
+
+- Implementación completa de tabla de rentabilidades rolling para activos y cartera.
+- Cálculo de retornos rolling a 7D, 30D, 90D, 180D, YTD, 1 año, 3 años*, 5 años*, 10 años*, Desde Compra*.
+- Indicadores anualizados en las columnas marcadas con *.
+- Filtrado para mostrar solo activos con participaciones > 0 en la fecha actual.
+- Tolerancia de ±30 días para búsqueda de precios históricos en fechas rolling.
+- Evita errores en fondos con fechas NAV irregulares o gaps de datos.
+- Poblado automático de históricos NAV solo desde la primera fecha real disponible sin extrapolación ficticia.
+- Cálculo de “Desde Compra*” en Cartera Total basado en la rentabilidad ponderada acumulada (WeightedReturn) considerando aportaciones reales.
+- Ajuste automático para evitar resultados inflados en carteras con historia corta o flujos variables.
+- Formateo robusto de tabla en Streamlit evitando errores con celdas None o NaN.
+- Mejoras en la visualización de la tabla de rentabilidades con porcentajes claros y celdas vacías en ausencia de datos.
+
 ---
 
 ## 🚀 Roadmap futuro
