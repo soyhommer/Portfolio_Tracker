@@ -1,6 +1,10 @@
 #Para traer actualizaciones del remoto:
 git pull origin main
 
+#Comando para actualizar ramas y fusionar con main
+git switch historicos && git add . && git commit -m "update" && git push origin historicos && git switch main && git pull origin main && git merge historicos && git push origin main
+
+
 #ver cambios
 git status
 

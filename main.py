@@ -6,7 +6,7 @@ from utils.transacciones import mostrar_tabla_transacciones, formulario_nueva_tr
 from utils.general import mostrar_estado_general, calcular_estado_actual
 from utils.ganancias import mostrar_ganancias_perdidas
 from utils.flujos import mostrar_flujos
-from utils.rentabilidad import mostrar_rentabilidad
+from utils.rentabilidad_frontend import mostrar_rentabilidad
 from utils.evolucion import mostrar_evolucion_valor_cartera
 from utils.benchmark import comparar_con_benchmark
 from utils.config import CACHE_TTL_HORAS
@@ -81,22 +81,23 @@ elif menu == "Rentabilidad":
     st.subheader("Rentabilidad histórica")
     if "cartera" in st.session_state:
         mostrar_rentabilidad(st.session_state["cartera"])
-        mostrar_evolucion_valor_cartera(st.session_state["cartera"])
-        comparar_con_benchmark(st.session_state["cartera"]) 
     else:
         st.warning("Selecciona una cartera para ver su rentabilidad.")
+        
 elif menu == "Ganancias / Pérdidas":
     st.subheader("Histórico de resultados")
     if "cartera" in st.session_state:
         mostrar_ganancias_perdidas(st.session_state["cartera"])
     else:
         st.warning("Selecciona una cartera para visualizar los resultados.")
+        
 elif menu == "Flujos":
     st.subheader("Flujos trimestrales")
     if "cartera" in st.session_state:
         mostrar_flujos(st.session_state["cartera"])
     else:
         st.warning("Selecciona una cartera para visualizar los flujos.")
+        
 elif menu == "Transacciones":
     st.subheader("Historial de transacciones")
     if "cartera" in st.session_state:

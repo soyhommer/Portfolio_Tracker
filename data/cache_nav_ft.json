@@ -1,38 +1,38 @@
 {
   "isin:ie00b2nxkw18": {
-    "timestamp": "2025-06-30T15:48:21.510508",
+    "timestamp": "2025-07-01T15:51:49.833601",
     "data": {
       "nombre": "Seilern World Growth EUR U R",
       "isin": "IE00B2NXKW18",
-      "nav": 480.06,
-      "fecha": "2025-06-27",
+      "nav": 481.72,
+      "fecha": "2025-06-30",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.82
+      "variacion_1d": 0.35
     }
   },
   "isin:ie0031724234": {
-    "timestamp": "2025-06-30T15:48:18.052399",
+    "timestamp": "2025-07-01T15:51:46.391574",
     "data": {
       "nombre": "Seilern World Growth EUR H R",
       "isin": "IE0031724234",
-      "nav": 340.93,
-      "fecha": "2025-06-27",
+      "nav": 342.45,
+      "fecha": "2025-06-30",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.88
+      "variacion_1d": 0.45
     }
   },
   "isin:es0112611001": {
-    "timestamp": "2025-06-30T15:48:10.473243",
+    "timestamp": "2025-07-01T15:51:37.999214",
     "data": {
       "nombre": "Azvalor Internacional FI",
       "isin": "ES0112611001",
-      "nav": 233.24,
-      "fecha": "2025-06-26",
+      "nav": 232.18,
+      "fecha": "2025-06-27",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 1.1
+      "variacion_1d": -0.46
     }
   },
   "nombre:bestinver internacional fi": {
@@ -108,63 +108,63 @@
     }
   },
   "isin:es0114638036": {
-    "timestamp": "2025-06-30T15:48:08.863030",
+    "timestamp": "2025-07-01T15:51:36.239582",
     "data": {
       "nombre": "Bestinver Internacional FI",
       "isin": "ES0114638036",
-      "nav": 64.22,
-      "fecha": "2025-06-27",
+      "nav": 63.95,
+      "fecha": "2025-06-30",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 1.0
+      "variacion_1d": -0.43
     }
   },
   "isin:es0182527038": {
-    "timestamp": "2025-06-30T15:48:12.900930",
+    "timestamp": "2025-07-01T15:51:41.235181",
     "data": {
       "nombre": "Cartesio Y FI",
       "isin": "ES0182527038",
-      "nav": 3349.87,
-      "fecha": "2025-06-26",
-      "divisa": "EUR",
-      "fuente": "FT.com",
-      "variacion_1d": 0.37
-    }
-  },
-  "isin:es0124037005": {
-    "timestamp": "2025-06-30T15:48:14.580301",
-    "data": {
-      "nombre": "Cobas Selección C FI",
-      "isin": "ES0124037005",
-      "nav": 144.0,
-      "fecha": "2025-06-26",
-      "divisa": "EUR",
-      "fuente": "FT.com",
-      "variacion_1d": 0.51
-    }
-  },
-  "isin:lu0690375182": {
-    "timestamp": "2025-06-30T15:48:16.423467",
-    "data": {
-      "nombre": "Fundsmith Equity Fund T EUR Acc",
-      "isin": "LU0690375182",
-      "nav": 60.27,
+      "nav": 3363.53,
       "fecha": "2025-06-27",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.92
+      "variacion_1d": 0.41
+    }
+  },
+  "isin:es0124037005": {
+    "timestamp": "2025-07-01T15:51:42.947307",
+    "data": {
+      "nombre": "Cobas Selección C FI",
+      "isin": "ES0124037005",
+      "nav": 144.48,
+      "fecha": "2025-06-27",
+      "divisa": "EUR",
+      "fuente": "FT.com",
+      "variacion_1d": 0.33
+    }
+  },
+  "isin:lu0690375182": {
+    "timestamp": "2025-07-01T15:51:44.610562",
+    "data": {
+      "nombre": "Fundsmith Equity Fund T EUR Acc",
+      "isin": "LU0690375182",
+      "nav": 60.82,
+      "fecha": "2025-06-30",
+      "divisa": "EUR",
+      "fuente": "FT.com",
+      "variacion_1d": 0.9
     }
   },
   "isin:es0173394034": {
-    "timestamp": "2025-06-30T15:48:19.919057",
+    "timestamp": "2025-07-01T15:51:48.066931",
     "data": {
       "nombre": "Renta 4 Bolsa España R FI",
       "isin": "ES0173394034",
-      "nav": 47.91,
-      "fecha": "2025-06-26",
+      "nav": 48.45,
+      "fecha": "2025-06-27",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.43
+      "variacion_1d": 1.12
     }
   }
 }
