@@ -36,15 +36,21 @@ def leer_csv_investing(file) -> pd.DataFrame:
     # Limpiar precios
     for col in ["Price", "Open", "High", "Low"]:
         df[col] = (
-            df[col]
-            .astype(str)
-            .str.replace(",", "")
-            .str.replace("%", "")
-            .astype(float)
-        )
+                df[col]
+                .astype(str)
+                .str.replace(",", ".")
+                .str.replace("%", "")
+                .astype(float)
+            )
 
     # Change %: opcional limpiar
-    df["Change %"] = df["Change %"].astype(str).str.strip()
+    df["Change %"] = (
+        df["Change %"]
+        .astype(str)
+        .str.replace(",", ".")
+        .str.replace("%", "")
+        .astype(float)
+    )
 
     # Ordenar por fecha
     df = df.sort_values("Date").reset_index(drop=True)
@@ -220,6 +226,7 @@ def get_nombre_activo_por_isin(isin: str) -> str:
 
     return nombre
 
+#Funcion para cruzar los registros de las transacciones con los registros de NAV disponibles para poder establecer que intervalos de NAV están faltantes para que fondos
 def detectar_faltantes_nav_por_cartera(transacciones_dir, nav_historico_dir):
     """
     Cruza las fechas de las transacciones de todas las carteras
@@ -285,7 +292,14 @@ def detectar_faltantes_nav_por_cartera(transacciones_dir, nav_historico_dir):
             # Verificar cobertura de fechas
             fechas_faltantes = []
             for fecha in fechas_tx:
-                covered = any(start <= fecha <= end for (start, end) in intervalos_disponibles)
+                covered = False
+                for start, end in intervalos_disponibles:
+                    if start <= fecha <= end:
+                        covered = True
+                        break
+                    elif fecha > end and (fecha - end).days <= 7:
+                        covered = True
+                        break
                 if not covered:
                     fechas_faltantes.append(fecha.strftime("%Y-%m-%d"))
 
@@ -376,6 +390,18 @@ def mostrar_gestor_historicos_nav():
         type=["csv"],
         help="Debe contener columnas: Date, Price, Open, High, Low, Change %"
     )
+
+    
+    st.caption(
+        """
+        ⚠️ El archivo CSV debe tener estas columnas EXACTAS (con este orden y ortografía):
+        **Date**, **Price**, **Open**, **High**, **Low**, **Change %**.
+        - Para Investing.com en español o local europeo, asegúrate de exportar la web en INGLÉS.
+        - Usar coma (`,`) como decimal (por ejemplo `232,179`) se convierte automáticamente.
+        - El separador de columnas debe ser punto y coma (`;`).
+        """
+    )
+    
 
     # 3️⃣ Vista previa del CSV subido
     if archivo and isin_final:

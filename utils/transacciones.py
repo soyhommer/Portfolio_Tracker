@@ -82,14 +82,17 @@ def mostrar_tabla_transacciones(cartera):
         cols.insert(cols.index("Posición") + 1, cols.pop(cols.index("ISIN")))
         df = df[cols]
 
-    st.markdown("**✔️ Edita directamente las transacciones. Puedes borrar filas con el icono 🗑️ de la tabla:**")
+    # Añadir columna de selección si no existe
+    if "Seleccionar" not in df.columns:
+        df.insert(0, "Seleccionar", False)
 
-    # ✅ Editable table with sortable columns
+    st.markdown("**✔️ Edita directamente las transacciones. Usa el icono 🗑️ para borrar filas individualmente y la casilla 'Seleccionar' para eliminar en lote. El menú de columna permite ordenar asc/desc:**")
+
     df_editado = st.data_editor(
         df,
         use_container_width=True,
-        num_rows="dynamic",
         column_config={
+            "Seleccionar": st.column_config.CheckboxColumn("Seleccionar"),
             "Fecha": st.column_config.DateColumn(
                 label="Fecha",
                 format="YYYY-MM-DD",
@@ -108,10 +111,23 @@ def mostrar_tabla_transacciones(cartera):
         },
     )
 
-    if st.button("💾 Guardar cambios en transacciones"):
-        guardar_transacciones(cartera, df_editado)
+    # Botón para borrar filas seleccionadas
+    if st.button("🗑️ Eliminar transacciones seleccionadas"):
+        seleccionadas = df_editado[df_editado["Seleccionar"]]
+        if seleccionadas.empty:
+            st.warning("⚠️ No se han marcado transacciones para eliminar.")
+        else:
+            df_filtrado = df_editado[df_editado["Seleccionar"] == False].drop(columns=["Seleccionar"])
+            guardar_transacciones(cartera, df_filtrado)
+            st.success(f"✅ Se eliminaron {len(seleccionadas)} transacciones.")
+            st.rerun()
 
-        for _, row in df_editado.iterrows():
+    # Botón para guardar todas las ediciones
+    if st.button("💾 Guardar cambios en transacciones"):
+        df_guardar = df_editado.drop(columns=["Seleccionar"])
+        guardar_transacciones(cartera, df_guardar)
+
+        for _, row in df_guardar.iterrows():
             nombre = row["Posición"]
             isin = row.get("ISIN")
             if isinstance(nombre, str) and isinstance(isin, str) and isin.strip() and isin != "—":
@@ -122,6 +138,45 @@ def mostrar_tabla_transacciones(cartera):
 
     return df
 
+def buscar_precio_historico_cercano(isin, fecha_transaccion, nav_historico_dir, dias_max=7):
+    """
+    Busca en histórico NAV el precio más cercano anterior a la fecha_transaccion,
+    siempre que esté a 7 días o menos.
+    """
+    path = nav_historico_dir / f"{isin}.csv"
+    if not path.exists():
+        return None
+
+    df = pd.read_csv(path)
+    if "Date" not in df.columns or "Price" not in df.columns:
+        return None
+
+    # Asegurar fechas en datetime
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    df = df.dropna(subset=["Date"])
+
+    # ✅ Convertir fecha_transaccion a Timestamp para evitar error de tipo
+    fecha_transaccion = pd.Timestamp(fecha_transaccion)
+
+    # Filtrar fechas anteriores o iguales
+    df = df[df["Date"] <= fecha_transaccion]
+
+    if df.empty:
+        return None
+
+    # Elegir fecha más cercana anterior
+    df["diff_days"] = (fecha_transaccion - df["Date"]).dt.days
+    df = df[df["diff_days"] >= 0]
+    df = df.sort_values("diff_days")
+
+    if df.empty:
+        return None
+
+    closest = df.iloc[0]
+    if closest["diff_days"] <= dias_max:
+        return closest["Price"]
+    else:
+        return None
 
 
 def formulario_nueva_transaccion(cartera):
@@ -162,7 +217,6 @@ def formulario_nueva_transaccion(cartera):
         submitted = st.form_submit_button("Añadir transacción")
 
         if submitted:
-            # Validación mínima del identificador
             if not identificador.strip():
                 st.error("❌ El campo ISIN / Ticker / Código es obligatorio.")
                 return
@@ -179,11 +233,25 @@ def formulario_nueva_transaccion(cartera):
             # Autocompletar PRECIO si está en 0
             if precio == 0.0:
                 precio_nav = buscar_nav_para_transaccion(identificador, fecha, NAV_HISTORICO_DIR)
+
                 if precio_nav is not None:
                     precio = precio_nav
                     st.success(f"✔️ Precio unitario autocompletado desde histórico NAV: {precio:.4f}")
                 else:
-                    st.warning("⚠️ No se encontró NAV en históricos para este activo y fecha. Precio dejado en 0.")
+                    # Intento alternativo: buscar precio anterior más cercano (<=7 días antes)
+                    precio_cercano = buscar_precio_historico_cercano(
+                        isin=identificador,
+                        fecha_transaccion=fecha,
+                        nav_historico_dir=NAV_HISTORICO_DIR,
+                        dias_max=7
+                    )
+                    if precio_cercano is not None:
+                        precio = precio_cercano
+                        st.success(
+                            f"✔️ Precio unitario autocompletado con histórico más cercano (≤7 días antes): {precio:.4f}"
+                        )
+                    else:
+                        st.warning("⚠️ No se encontró NAV en históricos para este activo ni para fechas cercanas. Precio dejado en 0.")
 
             # Construir registro alineado con el esquema EXISTENTE del CSV
             nueva = {
@@ -211,7 +279,6 @@ def formulario_nueva_transaccion(cartera):
             st.success("✅ Transacción añadida correctamente.")
             st.rerun()
 
-
 def buscar_nav_para_transaccion(isin, fecha, nav_historico_dir):
     """
     Busca en el histórico NAV el valor para un ISIN en la fecha dada.
@@ -233,7 +300,7 @@ def buscar_nav_para_transaccion(isin, fecha, nav_historico_dir):
 def importar_transacciones_excel(cartera):
     st.markdown("---")
     st.subheader("📥 Importar transacciones desde Excel")
-    archivo = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])
+    archivo = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])    
     if archivo is not None:
         try:
             df_excel = pd.read_excel(archivo)
