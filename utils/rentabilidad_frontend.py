@@ -149,13 +149,31 @@ def mostrar_rentabilidad(portfolio_name: str):
     def highlight_cells(val):
         if pd.isna(val):
             return ""
+
+        # Comparación directa para máximos y mínimos
         if val == max_gain:
             return "font-weight: bold;"
         if val == max_loss:
             return "color: red; font-weight: bold;"
-        if val < 0:
-            return "color: red;"
+
+        # Solo intentamos detectar negativos numéricos
+        try:
+            if float(val) < 0:
+                return "color: red;"
+        except (ValueError, TypeError):
+            pass
+
         return ""
+
+
+
+    def safe_percent_format(val):
+        try:
+            return "{:.2f}%".format(float(val))
+        except (ValueError, TypeError):
+            return val
+
+
 
     styled_table = pivot_table.style.format("{:,.2f}%").applymap(highlight_cells)
 
@@ -194,11 +212,19 @@ def mostrar_rentabilidad(portfolio_name: str):
     # Nota explicativa
     st.caption("* Las columnas marcadas con asterisco representan rentabilidades anualizadas")
 
+    df_rolling_detailed = df_rolling_detailed.fillna("")
+    
     # Mostrar tabla
     st.dataframe(
-        df_rolling_detailed.fillna(""),
+        df_rolling_detailed.style
+            .format(safe_percent_format)
+            .applymap(
+                highlight_cells,
+                subset=[col for col in df_rolling_detailed.columns if col not in ["Nombre", "ISIN"]]
+            ),
         use_container_width=True
     )
+
     
     # 📌 5️⃣ Benchmark Comparison
     st.header("📈 Comparativa con Benchmark")

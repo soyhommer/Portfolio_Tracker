@@ -675,10 +675,31 @@ def compute_enhanced_rolling_returns(df_portfolio, df_holdings, df_navs, df_cumu
     # Add Cartera Total
     entries = {"Nombre": "Cartera Total", "ISIN": ""}
     df_pv = df_portfolio.set_index("Fecha")
+    
+      
     for w in windows_days:
-        shifted = df_pv["PortfolioValue"].shift(freq=pd.Timedelta(days=w))
-        returns = (df_pv["PortfolioValue"] / shifted - 1).dropna()
-        entries[f"{w}D"] = round(returns.mean() * 100, 2) if not returns.empty else None
+        if w >= 365:
+            continue  # skip annualized here
+
+        target_date = today - pd.Timedelta(days=w)
+        df_valid = df_pv[df_pv.index <= target_date]
+        
+        if not df_valid.empty:
+            nav_past = df_valid.iloc[-1]["PortfolioValue"]
+            nav_today = df_pv.iloc[-1]["PortfolioValue"]
+
+            if nav_past > 0:
+                rentabilidad = (nav_today / nav_past) - 1
+                entries[f"{w}D"] = round(rentabilidad * 100, 2)
+            else:
+                entries[f"{w}D"] = None
+        else:
+            entries[f"{w}D"] = None
+                             
+    # for w in windows_days:
+        # shifted = df_pv["PortfolioValue"].shift(freq=pd.Timedelta(days=w))
+        # returns = (df_pv["PortfolioValue"] / shifted - 1).dropna()
+        # entries[f"{w}D"] = round(returns.mean() * 100, 2) if not returns.empty else None
 
     # YTD
     ytd_df = df_pv[df_pv.index >= ytd_start]
@@ -772,9 +793,28 @@ def compute_enhanced_rolling_returns(df_portfolio, df_holdings, df_navs, df_cumu
         entries = {"Nombre": name, "ISIN": isin}
 
         for w in windows_days:
-            shifted = df_isin["Price"].shift(freq=pd.Timedelta(days=w))
-            returns = (df_isin["Price"] / shifted - 1).dropna()
-            entries[f"{w}D"] = round(returns.mean() * 100, 2) if not returns.empty else None
+            if w >= 365:
+                continue
+
+            target_date = today - pd.Timedelta(days=w)
+            df_valid = df_isin[df_isin.index <= target_date]
+
+            if not df_valid.empty:
+                price_past = df_valid.iloc[-1]["Price"]
+                price_today = df_isin.iloc[-1]["Price"]
+
+                if price_past > 0:
+                    rentabilidad = (price_today / price_past) - 1
+                    entries[f"{w}D"] = round(rentabilidad * 100, 2)
+                else:
+                    entries[f"{w}D"] = None
+            else:
+                entries[f"{w}D"] = None                      
+        
+        # for w in windows_days:
+            # shifted = df_isin["Price"].shift(freq=pd.Timedelta(days=w))
+            # returns = (df_isin["Price"] / shifted - 1).dropna()
+            # entries[f"{w}D"] = round(returns.mean() * 100, 2) if not returns.empty else None
 
         # YTD
         ytd_df = df_isin[df_isin.index >= ytd_start]
