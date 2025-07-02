@@ -82,116 +82,126 @@ Aplicación local para el seguimiento y edición de carteras de inversión perso
 
 ## 🛠️ Arquitectura de archivos
 
-cartera_streamlit/
-|
+cPortfolio_Tracker/
+│
+├── main.py                  # Punto de entrada de la app Streamlit
+├── requirements.txt         # Dependencias del proyecto
+│
 ├── data/
-│ ├── transacciones/ # CSV por cartera
-│ └── nav_historico/ # CSV por ISIN
-|
-├── main.py # Punto de entrada Streamlit
-├── utils/
-│ ├── data_loader.py
-│ ├── nav_fetcher.py
-│ ├── investing_fetcher.py
-│ ├── morningstar_fetcher.py
-│ ├── ft_fetcher.py
-│ ├── merge_nav_data.py
-│ ├── ganancias.py
-│ ├── general.py
-│ ├── rentabilidad.py
-│ └── transacciones.py
+│   ├── benchmark/           # Datos de benchmarks por cartera
+│   ├── nav_historico/       # Históricos NAV por ISIN
+│   ├── outputs/             # Salidas exportadas (PDF/Excel u otros)
+│   ├── transacciones/       # CSVs de transacciones por cartera
+│   ├── activos_cache.json   # Cache de ISINs/nombres
+│   ├── cache_nav_ft.json    # Cache de NAVs desde FT
+│   ├── cache_nav_investing.json
+│   ├── cache_nav_morningstar.json
+│   ├── cache_nav_real.json
+│   └── carteras.json        # Definición de carteras
+│
+└── utils/
+    ├── __pycache__/         # Archivos compilados Python
+    │
+    ├── benchmark.py         # Carga y manejo de benchmarks
+    ├── config.py            # Paths y constantes globales
+    ├── data_loader.py       # Carga/guardado genérico de datos locales
+    ├── evolucion.py         # (opcional) lógica para evolución de carteras
+    ├── flujos.py            # Procesamiento de flujos netos
+    ├── formatting.py        # Formateadores y helpers UI
+    ├── ft_fetcher.py        # Scraping de NAVs de FT.com
+    ├── ganancias.py         # Cálculo de ganancias/pérdidas por activo
+    ├── general.py           # Estado general de cartera y NAVs
+    ├── historial_nav.py     # Validación y fusión de históricos NAV
+    ├── investing_fetcher.py # Scraping de Investing.com
+    ├── merge_nav_data.py    # Algoritmo de merge y validación cruzada de NAVs
+    ├── morningstar_fetcher.py # Scraping de Morningstar.es
+    ├── nav_cache.py         # Manejador de caché de NAVs
+    ├── nav_fetcher.py       # Orquestador para buscar NAVs
+    ├── rentabilidad_backend.py # Cálculo de rentabilidades TWR y ponderadas
+    ├── rentabilidad_frontend.py # Interfaz Streamlit para el módulo de rentabilidades
+    └── transacciones.py     # CRUD de transacciones con validación
 
 
----
-
-## ✅ Novedades recientes 
-
-### 🔁 Gestión Inteligente de NAVs y Cacheo
-
-* Búsqueda por nombre o ISIN con fusión de múltiples fuentes.
-* Cacheo local con control de expiración.
-* Scrapers independientes para Morningstar, FT y Investing.
-* Algoritmo de validación cruzada (`merge_nav_data`) priorizando la calidad del dato.
-
-### 🧠 Enriquecimiento Automático de Transacciones
-
-* Detección y asignación automática del ISIN por nombre del activo.
-* Persistencia de ISINs nuevos en caché tras edición o importación.
-* Formulario de nueva transacción con validación y sugerencias.
-
-### 📊 Rentabilidad y Ganancias Realistas
-
-* Cálculo de NAV actual y comparación con histórico de compra.
-* Ganancia/pérdida total por activo, % sobre desembolso, reembolsos y valoración de mercado.
-* Rentabilidad ponderada por NAV y fecha.
-
-### 🛡️ Validaciones y Manejo de Errores
-
-* Validación defensiva del CSV de transacciones: columnas requeridas, fechas, estructura.
-* Mensajes informativos en consola y Streamlit ante errores de scraping, parsing o estructura.
-
-### 🔍 Trazabilidad y Depuración
-
-* Consola detallada con trazas de llamadas a `merge_nav_data`.
-* Respuestas distintas si se busca por ISIN vs. nombre.
-* Etiqueta de fuente NAV visible.
 
 ---
 
-## 🔥 Funcionalidades adicionales implementadas
+## ✅ Novedades y Funcionalidades Implementadas
 
-### ✅ Edición avanzada de Transacciones
-- Tabla editable con ordenación ascendente/descendente por columnas.
-- Columna de selección (checkbox) a la izquierda para eliminar múltiples transacciones en lote.
-- Icono 🗑️ en cada fila para borrado individual.
-- Botón para guardar todas las ediciones en un solo paso.
-- Importación masiva desde Excel con validación de columnas.
+* **Gestión Inteligente de NAVs y Cacheo**
+  - Búsqueda por nombre o ISIN con fusión de múltiples fuentes.
+  - Cacheo local con control de expiración.
+  - Scrapers independientes para Morningstar, FT y Investing.
+  - Algoritmo de validación cruzada (`merge_nav_data`) priorizando la calidad del dato.
 
-### ✅ Autocompletado inteligente de NAV
-- Al agregar una nueva transacción con Precio = 0:
-  - Busca primero el NAV exacto en la fecha.
-  - Si no existe, usa el NAV más cercano hasta 7 días antes automáticamente.
+* **Enriquecimiento Automático de Transacciones**
+  - Detección y asignación automática del ISIN por nombre del activo.
+  - Persistencia de ISINs nuevos en caché tras edición o importación.
+  - Formulario de nueva transacción con validación y sugerencias.
+
+* **Edición avanzada de Transacciones**
+  - Tabla editable con ordenación ascendente/descendente por columnas.
+  - Columna de selección (checkbox) para borrado en lote.
+  - Icono 🗑️ para borrado individual.
+  - Botón para guardar todas las ediciones.
+  - Importación masiva desde Excel con validación de columnas.
+
+* **Autocompletado inteligente de NAV**
+  - Al agregar transacción con Precio = 0, busca NAV exacto o más cercano (hasta 7 días antes).
   - Notifica al usuario el valor asignado.
 
-### ✅ Validación de Cobertura NAV con tolerancia
-- Revisión de cobertura NAV de todas las transacciones de todas las carteras.
-- Marca como cubiertas las fechas con NAV exacto o con NAV anterior ≤7 días antes.
-- Reporte claro y tabulado en la interfaz de las fechas que requieren históricos adicionales.
+* **Validación de Cobertura NAV con Tolerancia**
+  - Verificación de cobertura NAV para todas las transacciones.
+  - Marca como cubiertas fechas con NAV exacto o ≤7 días anterior.
+  - Reporte tabulado en la interfaz de las fechas que requieren históricos adicionales.
 
-### ✅ Gestión completa de históricos NAV
-- Subida incremental de tramos de históricos Investing.com.
-- Validación de formato esperado con columnas:
+* **Gestión Completa de Históricos NAV**
+  - Subida incremental de tramos de Investing.com.
+  - Validación del formato esperado (decimal europeo `,` soportado).
+  - Fusión automática de fechas sin duplicados.
+  - Cacheo y sugerencia de nombres de activo por ISIN.
 
-- Conversión automática de decimal europeo (`,` a `.`).
-- Detección y visualización de intervalos continuos de fechas cubiertas.
-- Fusión automática sin duplicados de fechas.
-- Cacheo y sugerencia de nombres de activo por ISIN.
+* **Mensajes Aclaratorios en la UI**
+  - Nota bajo FileUploader explicando formato Investing.com esperado en INGLÉS.
+  - Soporte automático de `,` como decimal y `;` como separador.
 
-### ✅ Mensajes aclaratorios en UI
-- Nota bajo FileUploader explicando:
-- Formato Investing.com esperado en INGLÉS.
-- Decimal `,` soportado automáticamente.
-- Separador de columnas `;`.
+* **📈 Mejoras en el Módulo de Rentabilidades (Actualización 2025)**
+  - Gráficas con selector de horizonte dinámico (3M, 6M, 1Y, 3Y, 5Y, Desde inicio).
+  - Ajuste automático de frecuencia (semanal o mensual) según el horizonte elegido.
+  - Series de TWR y Rentabilidad Ponderada rebased desde 0 al inicio del período para mostrar rentabilidad acumulada real.
+  - Hover unificado en las gráficas mostrando todas las series al pasar el puntero por la fecha.
+  - Leyenda desplazada a la parte inferior para optimizar el ancho útil.
+  - KPI generales siempre calculados para toda la vida de la cartera (no afectados por el filtro de horizonte).
+  - Tablas de rentabilidad mensual y rolling returns independientes del horizonte seleccionado.
 
-### 📈 Mejoras en el módulo de Rentabilidades
+* **Rentabilidad y Ganancias Realistas**
+  - Cálculo de NAV actual y comparación con histórico de compra.
+  - Ganancia/pérdida total por activo, % sobre desembolso, reembolsos y valoración de mercado.
+  - Rentabilidad ponderada por NAV y fecha.
 
-- Implementación completa de tabla de rentabilidades rolling para activos y cartera.
-- Cálculo de retornos rolling a 7D, 30D, 90D, 180D, YTD, 1 año, 3 años*, 5 años*, 10 años*, Desde Compra*.
-- Indicadores anualizados en las columnas marcadas con *.
-- Filtrado para mostrar solo activos con participaciones > 0 en la fecha actual.
-- Tolerancia de ±30 días para búsqueda de precios históricos en fechas rolling.
-- Evita errores en fondos con fechas NAV irregulares o gaps de datos.
-- Poblado automático de históricos NAV solo desde la primera fecha real disponible sin extrapolación ficticia.
-- Cálculo de “Desde Compra*” en Cartera Total basado en la rentabilidad ponderada acumulada (WeightedReturn) considerando aportaciones reales.
-- Ajuste automático para evitar resultados inflados en carteras con historia corta o flujos variables.
-- Formateo robusto de tabla en Streamlit evitando errores con celdas None o NaN.
-- Mejoras en la visualización de la tabla de rentabilidades con porcentajes claros y celdas vacías en ausencia de datos.
+* **Tabla de Rentabilidades Rolling y Mensual**
+  - Rolling returns a 7D, 30D, 90D, 180D, YTD, 1 año, 3 años*, 5 años*, 10 años*, Desde Compra*.
+  - Indicadores anualizados en columnas marcadas con *.
+  - Filtrado para mostrar solo activos con participaciones > 0 en la fecha actual.
+  - Tolerancia de ±30 días en búsqueda de precios históricos.
+  - Poblado automático de históricos NAV solo desde la primera fecha real disponible sin extrapolación.
+  - Ajuste para evitar resultados inflados en carteras con historia corta o flujos variables.
+  - Formato robusto en Streamlit, evitando errores con None o NaN, y celdas vacías claras.
+
+* **Validaciones y Manejo de Errores**
+  - Validación defensiva del CSV de transacciones.
+  - Mensajes informativos en consola y Streamlit ante errores de scraping o parsing.
+
+* **Trazabilidad y Depuración**
+  - Consola con trazas de llamadas a `merge_nav_data`.
+  - Diferenciación en respuestas si se busca por ISIN o nombre.
+  - Etiqueta visible de la fuente NAV utilizada.
 
 ---
 
 ## 🚀 Roadmap futuro
 
-- Datos Divisas y cambios para expresarlo todo en la moneda base de la cartera
+- Datos Divisas y cambios para expresarlo todo en la moneda base de la cartera.
+- Adaptad fetched the Morningstar a nueva web.
 - Módulo de dividendos y splits.
 - Gestión de transacciones recurrentes.
 - Cálculo fiscal con FIFO/LIFO y compensación de plusvalías.
