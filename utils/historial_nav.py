@@ -13,50 +13,123 @@ from utils.config import NAV_HISTORICO_DIR, TRANSACCIONES_DIR, CACHE_NOMBRE_PATH
 # TRANSACCIONES_DIR = Path("data/transacciones")
 # TRANSACCIONES_DIR.mkdir(parents=True, exist_ok=True)
 
+def normalize_number_str(s: str) -> str:
+    """
+    Normaliza un string numérico con formato de miles/decimal.
+    
+    - Si tiene punto como separador decimal (US): elimina comas.
+    - Si tiene coma como separador decimal (EU): elimina puntos y convierte coma en punto.
+    """
+    if s is None:
+        return s
+    s = str(s).strip().replace('"', '').replace("'", '')
+    if not s:
+        return s
+
+    last_dot = s.rfind('.')
+    last_comma = s.rfind(',')
+
+    if last_dot > last_comma:
+        return s.replace(',', '')
+    elif last_comma > last_dot:
+        return s.replace('.', '').replace(',', '.')
+    else:
+        return s
+
+
 def leer_csv_investing(file) -> pd.DataFrame:
     """
     Lee un archivo CSV descargado desde Investing.com.
-    - Mantiene todas las columnas estándar (Date, Price, Open, High, Low, Change %)
+    - Mantiene las columnas estándar (Date, Price, Open, High, Low, Change %)
     - Convierte Date a formato YYYY-MM-DD
     - Convierte precios a float
     """
-    df = pd.read_csv(file)
+    
+    print("========== LEYENDO CSV ==========")
+    
+    try:
+        file.seek(0)
+    except Exception as e:
+        print("❌ No se pudo hacer seek(0):", e)
+    
+    try:
+        df = pd.read_csv(
+            file,
+            quotechar='"',
+            dtype=str,
+            keep_default_na=False,
+            encoding='utf-8'
+        )
+        print("✅ CSV leido con éxito")
+    except Exception as e:
+        print("❌ Error al leer CSV:", e)
+        raise
 
-    # Asegurar encabezados correctos
+    print("\n👉 Encabezados crudos:", list(df.columns))
+    print("\n👉 Primeras filas crudas:")
+    print(df.head(5))
+
+    # Asegurar columnas esperadas
     expected_columns = ["Date", "Price", "Open", "High", "Low", "Change %"]
     df.columns = [col.strip() for col in df.columns]
+    print("\n👉 Encabezados normalizados:", list(df.columns))
 
     if not all(col in df.columns for col in expected_columns):
-        raise ValueError("El CSV no tiene las columnas esperadas de Investing.com")
+        raise ValueError(f"❌ El CSV no tiene las columnas esperadas. Encontradas: {list(df.columns)}")
 
-    # Normalizar fecha
+    # Procesar fechas
+    print("\n========== CONVIRTIENDO FECHAS ==========")
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    print(df[["Date"]].head(5))
     df = df.dropna(subset=["Date"])
+    print("✅ Fechas normalizadas y NaNs eliminados")
 
-    # Limpiar precios
+    # Normalizar valores numéricos
     for col in ["Price", "Open", "High", "Low"]:
-        df[col] = (
+        print(f"\n========== NORMALIZANDO {col} ==========")
+        print("ANTES:")
+        print(df[col].head(5).to_list())
+
+        try:
+            df[col] = (
                 df[col]
-                .astype(str)
-                .str.replace(",", ".")
-                .str.replace("%", "")
+                .apply(normalize_number_str)
                 .astype(float)
             )
+        except Exception as e:
+            print(f"❌ Error al convertir columna {col}:")
+            print(df[col].head(10).to_list())
+            raise
 
-    # Change %: opcional limpiar
-    df["Change %"] = (
-        df["Change %"]
-        .astype(str)
-        .str.replace(",", ".")
-        .str.replace("%", "")
-        .astype(float)
-    )
+        print("DESPUÉS:")
+        print(df[col].head(5).to_list())
 
-    # Ordenar por fecha
+    print("\n========== NORMALIZANDO Change % ==========")
+    print("ANTES:")
+    print(df["Change %"].head(5).to_list())
+
+    try:
+        df["Change %"] = (
+            df["Change %"]
+            .str.replace("%", "")
+            .apply(normalize_number_str)
+            .astype(float)
+        )
+    except Exception as e:
+        print(f"❌ Error al convertir columna Change %:")
+        print(df["Change %"].head(10).to_list())
+        raise
+
+    print("DESPUÉS:")
+    print(df["Change %"].head(5).to_list())
+
+    # Ordenar
     df = df.sort_values("Date").reset_index(drop=True)
+    print("\n✅ DataFrame final ordenado por fecha:")
+    print(df.head(5))
 
+    print("\n✅✅✅ LECTURA Y NORMALIZACIÓN COMPLETADAS ✅✅✅")
     return df
-
 
 def cargar_historico_isin(isin: str) -> pd.DataFrame:
     """
