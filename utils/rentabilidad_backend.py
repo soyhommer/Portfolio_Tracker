@@ -931,6 +931,23 @@ def compute_enhanced_rolling_returns(df_portfolio, df_holdings, df_navs, df_cumu
 
     return pd.DataFrame(results)
 
+def calculate_annualized_volatility(df_portfolio_value):
+    """
+    Computes annualized volatility (% std) of daily portfolio returns.
+    Assumes 252 trading days per year.
+    """
+    if df_portfolio_value.empty or len(df_portfolio_value) < 2:
+        return None
+
+    df_sorted = df_portfolio_value.sort_values("Fecha").set_index("Fecha")
+    daily_returns = df_sorted["PortfolioValue"].pct_change().dropna()
+
+    if daily_returns.empty:
+        return None
+
+    annualized_vol = daily_returns.std() * (252**0.5) * 100
+    return annualized_vol
+
 # =========================================
 #  BENCHMARK COMPARISSON LAYER
 # =========================================
