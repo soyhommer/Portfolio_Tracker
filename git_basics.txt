@@ -5,6 +5,7 @@ git pull origin main
 git switch historicos && git add . && git commit -m "update" && git push origin historicos && git switch main && git pull origin main && git merge historicos && git push origin main
 
 
+
 #ver cambios
 git status
 
@@ -28,5 +29,13 @@ git add .
 git commit -m "Tu mensaje de commit"
 git push origin main
 
+#Ver el log para verificar
+git log --oneline --graph --decorate
 
+#Flujo para hacer merge y push con main desde otra rama
+git checkout main
+git pull origin main
+git merge rentabilidades
+# (resolver conflictos si salen)
+git push origin main
 
