@@ -56,7 +56,6 @@ Aplicación local para el seguimiento y edición de carteras de inversión perso
 | **Morningstar.es**           | Fondos UCITS, PPS españoles                 | Scraping     | 🥇 Alta    | Muy alta    |
 | **FT.com (Financial Times)** | Fondos UCITS internacionales                | Scraping     | 🥈 Media   | Alta        |
 | **Investing.com**            | Fondos UCITS, gráficos                      | Scraping     | 🥉 Baja    | Media       |
-| **FundAPI.io**               | Fondos UCITS europeos (ISIN, VL, categoría) | API          | Secundaria| Alta        |
 | **CNMV**                     | Fondos y PPS registrados en España          | Scraping     | Backup    | Alta        |
 | **Yahoo Finance (yfinance)** | Acciones, ETFs, algunos fondos              | Python       | Opcional  | Inconsistente|
 
@@ -122,6 +121,99 @@ cPortfolio_Tracker/
     └── transacciones.py     # CRUD de transacciones con validación
 
 
+## 📝 Guía rápida de instalación y ejecución
+
+### 1️⃣ Requisitos previos
+
+* **Python 3.10 o superior** instalado en tu máquina.
+* (Opcional pero recomendado) Tener **Git** instalado para clonar el repositorio.
+
+---
+
+### 2️⃣ Descargar el proyecto
+
+**Opcion A: Clonar con Git**
+
+```bash
+git clone https://github.com/soyhommer/Portfolio_Tracker.git
+cd Portfolio_Tracker
+```
+
+**Opcion B: Descargar ZIP**
+
+* Haz clic en **Code > Download ZIP** en GitHub.
+* Descomprime el archivo en tu ordenador.
+* Abre la carpeta descomprimida en tu terminal o editor.
+
+---
+
+### 3️⃣ Crear un entorno virtual
+
+**En Windows (PowerShell):**
+
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+**En macOS/Linux:**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+✅ Verás el prompt del terminal con el entorno virtual activado.
+
+---
+
+### 4️⃣ Instalar las dependencias
+
+Asegúrate de estar en la carpeta raíz del proyecto (donde está `requirements.txt`):
+
+```bash
+pip install -r requirements.txt
+```
+
+✅ Esto descargará e instalará todos los paquetes necesarios.
+
+---
+
+### 5️⃣ Ejecutar la aplicación
+
+Para iniciar la app localmente en tu navegador:
+
+```bash
+streamlit run main.py
+```
+
+✅ Esto abrirá automáticamente la interfaz en tu navegador predeterminado.
+
+---
+
+### 6️⃣ Salir del entorno virtual
+
+Cuando termines de trabajar, puedes desactivar el entorno con:
+
+```bash
+deactivate
+```
+
+---
+
+### ⚡️ Notas adicionales
+
+* Para **actualizar dependencias** en el futuro:
+
+```bash
+pip install --upgrade -r requirements.txt
+```
+
+* Si quieres trabajar en otro ordenador, repite estos mismos pasos.
+
+---
+
+🌟 ¡Y listo! Con estos pasos tendrás el proyecto funcionando localmente para gestionar y analizar tus carteras de inversión de forma sencilla.
 
 ---
 
