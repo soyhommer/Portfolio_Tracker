@@ -1,11 +1,15 @@
 import os
 import re
+import logging
 import pandas as pd
 import streamlit as st
 from utils.nav_fetcher import get_nav_real as get_nav
 from utils.nav_fetcher import cargar_cache_nav
 from utils.nav_cache import actualizar_cache_isin
 from utils.config import TRANSACCIONES_DIR, NAV_HISTORICO_DIR
+
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(message)s")
+logger = logging.getLogger(__name__)
 
 # DATA_DIR = "data"
 # TRANSACCIONES_DIR = os.path.join(DATA_DIR, "transacciones")
@@ -57,6 +61,33 @@ def extraer_isin(nombre):
     if datos and datos.get("isin") and datos.get("nav") is not None:
         return datos["isin"]
     return "—"
+
+def validar_stock_no_negativo(df_transacciones: pd.DataFrame) -> list:
+    df_transacciones = df_transacciones.copy()
+    df_transacciones = df_transacciones.sort_values(["ISIN", "Fecha"])
+
+    problemas = []
+
+    for isin, group in df_transacciones.groupby("ISIN"):
+        saldo_participaciones = 0.0
+
+        for _, row in group.iterrows():
+            tipo = str(row["Tipo"]).lower()
+            participaciones = row["Participaciones"]
+
+            if pd.isna(participaciones):
+                participaciones = 0
+
+            if tipo.startswith("compra"):
+                saldo_participaciones += participaciones
+            elif tipo.startswith("venta"):
+                saldo_participaciones -= participaciones
+
+            if saldo_participaciones < -1e-4:
+                problemas.append(isin)
+                break  # ya no hace falta seguir revisando este ISIN
+
+    return problemas
 
 def mostrar_tabla_transacciones(cartera):
     
@@ -170,7 +201,13 @@ def mostrar_tabla_transacciones(cartera):
 
     # Botón para guardar todas las ediciones
     if st.button("💾 Guardar cambios en transacciones"):
+    
         df_guardar = df_editado.drop(columns=["Seleccionar"])
+
+        if not validar_stock_no_negativo(df_guardar):
+            st.error("❌ Error: hay ventas que exceden el stock disponible. Corrige antes de guardar.")
+            return
+        
         guardar_transacciones(cartera, df_guardar)
 
         for _, row in df_guardar.iterrows():
@@ -225,26 +262,38 @@ def buscar_precio_historico_cercano(isin, fecha_transaccion, nav_historico_dir, 
         return None
 
 
-def formulario_nueva_transaccion(cartera):
+def formulario_nueva_transaccion(cartera: str) -> None:
+    """
+    Formulario de Streamlit para añadir manualmente una nueva transacción a la cartera.
+    Valida stock antes de guardar. Autocompleta ventas totales.
+    """
     st.markdown("---")
-    st.subheader("Añadir nueva transacción")
+    st.subheader("➕ Añadir nueva transacción")
 
-    df = cargar_transacciones(cartera)
+    # Inicializar feedback
+    if "feedback_tipo" not in st.session_state:
+        st.session_state["feedback_tipo"] = ""
+    if "feedback_mensaje" not in st.session_state:
+        st.session_state["feedback_mensaje"] = ""
+
+    df_transacciones = cargar_transacciones(cartera)
 
     with st.form(key="form_transaccion"):
         col1, col2, col3 = st.columns(3)
 
         with col1:
             identificador = st.text_input(
-                "ISIN / Ticker / Código",
-                help="Código identificativo del activo (ISIN, Ticker u otro). Se guardará en la columna ISIN."
+                label="ISIN / Ticker / Código",
+                value="",
+                help="Código identificativo del activo (ISIN, Ticker u otro)."
             )
             tipo = st.selectbox("Tipo", ["Compra", "Venta", "Venta total"])
 
         with col2:
             nombre = st.text_input(
-                "Nombre del activo",
-                help="Nombre del fondo, acción, PP, ETF, etc. Se guardará en la columna Posición. Si se deja vacío se intentará autocompletar desde históricos o consultar online."
+                label="Nombre del activo",
+                value="",
+                help="Nombre del fondo, acción, PP, ETF, etc."
             )
             participaciones = st.number_input("Participaciones", min_value=0.0001, format="%.4f")
             fecha = st.date_input("Fecha")
@@ -252,49 +301,87 @@ def formulario_nueva_transaccion(cartera):
         with col3:
             moneda = st.selectbox("Moneda", ["EUR", "USD", "GBP", "CHF", "JPY"])
             precio = st.number_input(
-                "Precio unitario",
+                label="Precio unitario",
                 min_value=0.0,
                 value=0.0,
                 format="%.4f",
-                help="Si se deja en 0 se intentará completar automáticamente con el histórico NAV."
+                help="Si se deja en 0 se intentará completar con histórico NAV."
             )
             gasto = st.number_input("Gasto (opcional)", min_value=0.0, format="%.2f", value=0.0)
 
         submitted = st.form_submit_button("Añadir transacción")
 
         if submitted:
+            
+            logger.debug("==== NUEVO SUBMIT DE FORMULARIO ====")
+            logger.debug(f"Tipo: {tipo}")
+            logger.debug(f"ISIN: {identificador}")
+            logger.debug(f"Participaciones input: {participaciones}")
+            logger.debug(f"Fecha: {fecha}")
+
+
+            # Limpiar feedback previo
+            st.session_state["feedback_tipo"] = ""
+            st.session_state["feedback_mensaje"] = ""
+
+            mensajes_autocompletado = []
+
             if not identificador.strip():
-                st.error("❌ El campo ISIN / Ticker / Código es obligatorio.")
+                st.session_state["feedback_tipo"] = "error"
+                st.session_state["feedback_mensaje"] = "❌ El campo ISIN / Ticker / Código es obligatorio."
                 return
 
-             # Forzar participaciones si Venta total
+            # Verificar saldo actual antes de agregar
+            saldo_actual = obtener_participaciones_actuales(identificador, fecha, cartera)
+            logger.debug(f"Saldo actual para {identificador} en {fecha}: {saldo_actual:.6f}")
+
+
             if tipo.lower() == "venta total":
-                participaciones = obtener_participaciones_actuales(identificador, fecha, cartera)
-                if participaciones <= 0.0:
-                    st.error("❌ No se encontraron participaciones vigentes para liquidar en Venta total.")
+                logger.debug("Modo venta total detectado")
+                if saldo_actual <= 0.0:
+                    logger.error("Venta total rechazada por saldo <= 0")
+                    st.session_state["feedback_tipo"] = "error"
+                    st.session_state["feedback_mensaje"] = (
+                        "❌ No hay participaciones disponibles para Venta total."
+                    )
                     return
-                else:
-                    st.success(f"✔️ Venta total: se asignaron automáticamente {participaciones:.4f} participaciones.")
+                participaciones = saldo_actual
+                logger.debug(f"Participaciones asignadas en venta total: {participaciones:.6f}")
+                mensajes_autocompletado.append(
+                    f"✔️ Venta total: se asignaron {participaciones:.4f} participaciones."
+                )
+
+            elif tipo.lower() == "venta":
+                logger.debug("Modo venta normal detectado")
+                logger.debug(f"Participaciones solicitadas: {participaciones:.6f}, saldo disponible: {saldo_actual:.6f}")
+                if participaciones - saldo_actual > 1e-4:
+                    st.session_state["feedback_tipo"] = "error"
+                    st.session_state["feedback_mensaje"] = (
+                        f"❌ No tienes suficientes participaciones para vender.\n"
+                        f"Stock disponible a {fecha}: {saldo_actual:.4f}\n"
+                        f"Participaciones pedidas: {participaciones:.4f}"
+                    )
+                    st.rerun()
 
 
-            # Autocompletar NOMBRE si está vacío
+            # Autocompletar nombre si está vacío
             if not nombre.strip():
                 datos_nav = get_nav(identificador)
                 if datos_nav and "nombre" in datos_nav:
                     nombre = datos_nav["nombre"]
-                    st.success(f"✔️ Nombre del activo autocompletado: {nombre}")
+                    mensajes_autocompletado.append(f"✔️ Nombre autocompletado: {nombre}")
                 else:
-                    st.warning("⚠️ No se pudo autocompletar el nombre del activo. Por favor complétalo manualmente si puedes.")
+                    mensajes_autocompletado.append("⚠️ No se pudo autocompletar el nombre del activo.")
 
-            # Autocompletar PRECIO si está en 0
+            # Autocompletar precio si está en 0
             if precio == 0.0:
                 precio_nav = buscar_nav_para_transaccion(identificador, fecha, NAV_HISTORICO_DIR)
-
                 if precio_nav is not None:
                     precio = precio_nav
-                    st.success(f"✔️ Precio unitario autocompletado desde histórico NAV: {precio:.4f}")
+                    mensajes_autocompletado.append(
+                        f"✔️ Precio autocompletado desde histórico NAV: {precio:.4f}"
+                    )
                 else:
-                    # Intento alternativo: buscar precio anterior más cercano (<=7 días antes)
                     precio_cercano = buscar_precio_historico_cercano(
                         isin=identificador,
                         fecha_transaccion=fecha,
@@ -303,14 +390,16 @@ def formulario_nueva_transaccion(cartera):
                     )
                     if precio_cercano is not None:
                         precio = precio_cercano
-                        st.success(
-                            f"✔️ Precio unitario autocompletado con histórico más cercano (≤7 días antes): {precio:.4f}"
+                        mensajes_autocompletado.append(
+                            f"✔️ Precio autocompletado (≤7 días antes): {precio:.4f}"
                         )
                     else:
-                        st.warning("⚠️ No se encontró NAV en históricos para este activo ni para fechas cercanas. Precio dejado en 0.")
+                        mensajes_autocompletado.append(
+                            "⚠️ No se encontró NAV para este activo. Precio dejado en 0."
+                        )
 
-            # Construir registro alineado con el esquema EXISTENTE del CSV
-            nueva = {
+            # ✅ CONSTRUYE SOLO SI PASÓ TODO
+            nueva_fila = {
                 "Posición": nombre,
                 "ISIN": identificador,
                 "Tipo": tipo,
@@ -321,19 +410,63 @@ def formulario_nueva_transaccion(cartera):
                 "Gasto": gasto
             }
 
-            # Añadir al dataframe
-            df = pd.concat([df, pd.DataFrame([nueva])], ignore_index=True)
+            logger.debug("Datos finales para nueva fila:")
+            logger.debug({
+                "Posición": nombre,
+                "ISIN": identificador,
+                "Tipo": tipo,
+                "Participaciones": participaciones,
+                "Fecha": fecha,
+                "Moneda": moneda,
+                "Precio": precio,
+                "Gasto": gasto
+            })
 
-            # Limpieza y validación de ISIN
-            from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
-            df = limpiar_isin(df)
-            validar_isin_vs_nombre(df)
+            # Simula la tabla final tras añadir
+            df_simulado = pd.concat([df_transacciones, pd.DataFrame([nueva_fila])], ignore_index=True)
+            logger.debug("Validando stock en DataFrame simulado con la nueva fila agregada")
 
-            # Guardar
-            guardar_transacciones(cartera, df)
+            # Validación defensiva: saldo no negativo
+            if tipo.lower() == "compra":
+                logger.debug("Validando saldo en DataFrame simulado para compra")
+                df_simulado = pd.concat([df_transacciones, pd.DataFrame([nueva_fila])], ignore_index=True)
+                problemas = validar_stock_no_negativo(df_simulado)
+                if problemas:
+                    logger.error(f"Validación de saldo negativa. Problemas encontrados: {problemas}")
+                    st.session_state["feedback_tipo"] = "error"
+                    st.session_state["feedback_mensaje"] = (
+                        "❌ La transacción NO se ha guardado porque crearía participaciones negativas en:\n"
+                        + "\n".join(f"- {fondo}" for fondo in problemas)
+                        + "\n✏️ Corrige los datos del formulario o añade otras transacciones válidas."
+                    )
+                    return
+            else:
+                # Para venta o venta total NO validas después de agregar.
+                logger.debug("Saltando validación post-agregado para venta/venta total")
 
-            st.success("✅ Transacción añadida correctamente.")
+            # Guardar SIEMPRE al final
+            guardar_transacciones(cartera, df_simulado)
+            logger.debug("Guardando transacciones en CSV")
+
+            mensaje_final = "✅ Transacción añadida correctamente."
+            if mensajes_autocompletado:
+                mensaje_final += "\n\n" + "\n".join(mensajes_autocompletado)
+
+            st.session_state["feedback_tipo"] = "success"
+            st.session_state["feedback_mensaje"] = mensaje_final
             st.rerun()
+
+    # Mostrar feedback fuera del form
+    if st.session_state["feedback_mensaje"]:
+        if st.session_state["feedback_tipo"] == "error":
+            st.error(st.session_state["feedback_mensaje"])
+        elif st.session_state["feedback_tipo"] == "success":
+            st.success(st.session_state["feedback_mensaje"])
+        elif st.session_state["feedback_tipo"] == "warning":
+            st.warning(st.session_state["feedback_mensaje"])
+        else:
+            st.info(st.session_state["feedback_mensaje"])
+
 
 def buscar_nav_para_transaccion(isin, fecha, nav_historico_dir):
     """
@@ -370,6 +503,26 @@ def importar_transacciones_excel(cartera):
             from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
             df = limpiar_isin(df)
             validar_isin_vs_nombre(df)                     
+
+            #Vigilancia de stock de participaciones
+            problemas = validar_stock_no_negativo(df)
+            if problemas:
+                st.error("❌ La transacción NO se ha guardado porque crearía participaciones negativas en:")
+                for fondo in problemas:
+                    st.warning(f"- {fondo}")
+                st.info("✏️ Corrige los datos del formulario o añade otras transacciones válidas.")
+                
+                # Desbloquear botón
+                if "form_transaccion" in st.session_state:
+                    st.session_state["form_transaccion"] = False
+
+                # Limpiar campos si quieres (opcional)
+                st.session_state.pop("ISIN / Ticker / Código", None)
+                st.session_state.pop("Nombre del activo", None)
+                st.session_state.pop("Participaciones", None)
+                st.session_state.pop("Precio unitario", None)
+                st.session_state.pop("Gasto (opcional)", None)
+                return
 
             guardar_transacciones(cartera, df)
             st.success(f"Se han importado {len(df_excel)} transacciones correctamente.")

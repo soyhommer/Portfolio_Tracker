@@ -21,12 +21,15 @@ TRANSACCIONES_DIR = DATA_DIR / "transacciones"
 NAV_HISTORICO_DIR = DATA_DIR / "nav_historico"
 BENCHMARK_DIR = DATA_DIR / "benchmark"
 OUTPUT_DIR = DATA_DIR / "outputs"
+CACHE_DIR = DATA_DIR / "cache"
 
 # Asegurar existencia de directorios
 TRANSACCIONES_DIR.mkdir(parents=True, exist_ok=True)
 NAV_HISTORICO_DIR.mkdir(parents=True, exist_ok=True)
 BENCHMARK_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
 
 # --------------------------
 # CACHE PARA NOMBRE DE ACTIVO
@@ -47,3 +50,9 @@ def get_benchmark_path(portfolio_name: str):
     Returns the Path to the benchmark CSV for a specific portfolio.
     """
     return BENCHMARK_DIR / f"{portfolio_name}_benchmark.csv"
+
+def get_ganancias_cache_path(portfolio_name: str) -> Path:
+    """
+    Returns the Path to the Gananchias cached calculations CSV for a specific portfolio.
+    """
+    return CACHE_DIR / f"{portfolio_name}_ganancias.csv"
