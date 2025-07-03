@@ -168,5 +168,25 @@
     "variacion_1d": -0.04,
     "fuente": "morningstar",
     "fuente_variacion": "morningstar"
+  },
+  "Seilern World Growth EUR H FI": {
+    "nombre": "Seilern World Growth EUR H FI",
+    "isin": "IE0031724234",
+    "nav": 343.68,
+    "fecha": "2025-07-01",
+    "divisa": "EUR",
+    "variacion_1d": 0.36,
+    "fuente": "ft",
+    "fuente_variacion": "ft"
+  },
+  "Seilern World Growth EUR U FI": {
+    "nombre": "Seilern World Growth EUR U FI",
+    "isin": "IE00B2NXKW18",
+    "nav": 482.44,
+    "fecha": "2025-07-01",
+    "divisa": "EUR",
+    "variacion_1d": 0.15,
+    "fuente": "ft",
+    "fuente_variacion": "ft"
   }
 }

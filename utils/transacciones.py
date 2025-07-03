@@ -15,10 +15,28 @@ def obtener_ruta_transacciones(cartera):
 
 def cargar_transacciones(cartera):
     path = obtener_ruta_transacciones(cartera)
+    columnas_correctas = ["Posición", "ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
+
     if os.path.exists(path):
-        return pd.read_csv(path)
+        df = pd.read_csv(path)
+        # Quitar columnas no esperadas
+        df = df[[col for col in df.columns if col in columnas_correctas]]
+
+        # Asegurar todas las columnas correctas
+        for col in columnas_correctas:
+            if col not in df.columns:
+                if col in ["Posición", "ISIN", "Tipo", "Moneda"]:
+                    df[col] = ""
+                else:
+                    df[col] = 0.0
+
+        # Reordenar
+        df = df[columnas_correctas]
+        return df
+
     else:
-        return pd.DataFrame(columns=["Posición", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"])
+        return pd.DataFrame(columns=columnas_correctas)
+
 
 def guardar_transacciones(cartera, df):
     path = obtener_ruta_transacciones(cartera)
@@ -41,13 +59,41 @@ def extraer_isin(nombre):
     return "—"
 
 def mostrar_tabla_transacciones(cartera):
+    
     st.markdown(f"### Transacciones de la cartera: {cartera}")
 
+    # Cargar datos del CSV
     df = cargar_transacciones(cartera)
 
-    from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
-    df = limpiar_isin(df)
-    validar_isin_vs_nombre(df)
+    # Filtrar columnas válidas
+    columnas_correctas = [
+        "Seleccionar", "Posición", "ISIN", "Tipo", 
+        "Participaciones", "Fecha", "Moneda", "Precio", "Gasto", "Valor operación"
+    ]
+    df = df[[col for col in df.columns if col in columnas_correctas]]
+
+    # Añadir columnas faltantes
+    for col in columnas_correctas:
+        if col not in df.columns:
+            if col == "Seleccionar":
+                df[col] = False
+            elif col in ["Posición", "ISIN", "Tipo", "Moneda", "Fecha"]:
+                df[col] = ""
+            else:
+                df[col] = 0.0
+
+    # Reordenar
+    df = df[columnas_correctas]
+                                                                 
+    df["Valor operación"] = df["Participaciones"] * df["Precio"] + df["Gasto"]
+    df["Valor operación"] = df["Valor operación"].round(2)
+
+    # Reordenar columnas para colocar 'Valor operación' después de 'Gasto'
+    cols = df.columns.tolist()
+    if "Gasto" in cols and "Valor operación" in cols:
+        gasto_idx = cols.index("Gasto")
+        cols.insert(gasto_idx + 1, cols.pop(cols.index("Valor operación")))
+        df = df[cols]
 
     # Validación defensiva de columna clave
     if "Posición" not in df.columns:
@@ -221,6 +267,16 @@ def formulario_nueva_transaccion(cartera):
                 st.error("❌ El campo ISIN / Ticker / Código es obligatorio.")
                 return
 
+             # Forzar participaciones si Venta total
+            if tipo.lower() == "venta total":
+                participaciones = obtener_participaciones_actuales(identificador, fecha, cartera)
+                if participaciones <= 0.0:
+                    st.error("❌ No se encontraron participaciones vigentes para liquidar en Venta total.")
+                    return
+                else:
+                    st.success(f"✔️ Venta total: se asignaron automáticamente {participaciones:.4f} participaciones.")
+
+
             # Autocompletar NOMBRE si está vacío
             if not nombre.strip():
                 datos_nav = get_nav(identificador)
@@ -313,10 +369,36 @@ def importar_transacciones_excel(cartera):
             
             from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
             df = limpiar_isin(df)
-            validar_isin_vs_nombre(df)
-            
+            validar_isin_vs_nombre(df)                     
+
             guardar_transacciones(cartera, df)
             st.success(f"Se han importado {len(df_excel)} transacciones correctamente.")
             st.rerun()
         except Exception as e:
             st.error(f"Error al procesar el archivo: {e}")
+            
+def obtener_participaciones_actuales(isin, fecha, cartera):
+    """
+    Devuelve el número de participaciones actuales para un ISIN en la fecha dada.
+    Suma todas las compras y ventas previas en la cartera.
+    """
+    df = cargar_transacciones(cartera)
+    if df.empty or "ISIN" not in df.columns or "Participaciones" not in df.columns or "Tipo" not in df.columns:
+        return 0.0
+
+    df["Fecha"] = pd.to_datetime(df["Fecha"], errors='coerce')
+    df = df.dropna(subset=["Fecha"])
+    df = df[df["Fecha"] <= pd.to_datetime(fecha)]
+
+    df_isin = df[df["ISIN"] == isin]
+    if df_isin.empty:
+        return 0.0
+
+    df_isin["Sign"] = df_isin["Tipo"].apply(
+        lambda x: 1 if x.lower().startswith("compra") else -1
+    )
+    df_isin["ParticipacionesAjustadas"] = df_isin["Participaciones"] * df_isin["Sign"]
+    total = df_isin["ParticipacionesAjustadas"].sum()
+
+    return max(total, 0.0)
+

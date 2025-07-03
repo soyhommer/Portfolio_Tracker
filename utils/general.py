@@ -34,11 +34,41 @@ def calcular_estado_actual(df):
         ])
 
     df["Importe"] = df["Participaciones"] * df["Precio"]
-    df_agrupado = df.groupby(["Posición", "ISIN"]).agg({
-        "Participaciones": "sum",
-        "Importe": "sum",
+    
+    # Aplicar signo a las participaciones según el tipo
+    df["Sign"] = df["Tipo"].apply(lambda x: 1 if x.lower().startswith("compra") else -1)
+    df["ParticipacionesAjustadas"] = df["Participaciones"] * df["Sign"]
+    df["Importe"] = df["Participaciones"] * df["Precio"]
+    df["ImporteAjustado"] = df["Importe"] * df["Sign"]
+    
+    # Agregar por ISIN
+    df_agrupado = df.groupby(["ISIN"]).agg({
+        "ParticipacionesAjustadas": "sum",
+        "ImporteAjustado": "sum",
         "Fecha": "max"
     }).reset_index()
+
+    # Renombrar para coherencia
+    df_agrupado = df_agrupado.rename(columns={
+        "ParticipacionesAjustadas": "Participaciones",
+        "ImporteAjustado": "Importe"
+    })
+
+    # FILTRAR activos liquidados
+    df_agrupado = df_agrupado[df_agrupado["Participaciones"] > 0]
+
+    # Elegir nombre más frecuente por ISIN (Mismo ISIN no siempre mismo nombre)
+    nombre_map = (
+        df.groupby("ISIN")["Posición"]
+        .agg(lambda x: x.mode().iloc[0] if not x.mode().empty else x.iloc[-1])
+        .reset_index()
+    )
+
+    # Merge del nombre elegido
+    df_agrupado = pd.merge(df_agrupado, nombre_map, on="ISIN", how="left")
+
+    # Renombrar para compatibilidad con el resto del código
+    df_agrupado = df_agrupado.rename(columns={"Nombre": "Posición"})
 
     resultados = []
 

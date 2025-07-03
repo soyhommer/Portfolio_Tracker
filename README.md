@@ -42,6 +42,18 @@ Aplicación local para el seguimiento y edición de carteras de inversión perso
 * Importación desde Excel.
 * Ordenación por cualquier columna.
 
+#### 🆕 Módulo de Divisas (FX)
+
+##### Descripción
+Permite convertir todos los NAVs, valoraciones de cartera y flujos de caja a la **moneda base de la cartera**. Soporta carteras en EUR, USD, GBP, etc., calculando conversiones consistentes a partir de un pivot EUR usando datos oficiales del BCE.
+
+##### Funcionalidades
+- Descarga y parsing automático del histórico de tipos de cambio del BCE.
+- Archivo único de referencia (`euro_forex.json`) con todos los rates históricos en base EUR.
+- Conversión en cualquier fecha entre pares de divisas usando EUR como pivot.
+- Actualización automática o bajo demanda.
+- Fallback en frontend para recarga manual en caso de corrupción de datos.
+
 ### 4. Persistencia
 
 * Todas las carteras, transacciones y activos se guardan localmente (formato CSV).
@@ -119,7 +131,8 @@ cPortfolio_Tracker/
     ├── rentabilidad_backend.py # Cálculo de rentabilidades TWR y ponderadas
     ├── rentabilidad_frontend.py # Interfaz Streamlit para el módulo de rentabilidades
     └── transacciones.py     # CRUD de transacciones con validación
-
+    ├── fx_loader.py             # Carga y consulta de rates históricos
+    └── fx_updater.py           # Descarga y parsing desde el BCE
 
 ## 📝 Guía rápida de instalación y ejecución
 
