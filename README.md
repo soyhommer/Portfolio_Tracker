@@ -305,11 +305,12 @@ pip install --upgrade -r requirements.txt
 
 ## 🚀 Roadmap futuro
 
+- Rehacer morningstar_fetcher.py con la nueva web de morningstar
+- Cálculo fiscal con FIFO/LIFO y compensación de plusvalías. Ajustar calculo de rentabilidad con RoR, TWT y MWR con el balance FIFO de cada activo.
 - Datos Divisas y cambios para expresarlo todo en la moneda base de la cartera.
-- Adaptad fetched the Morningstar a nueva web.
+- Terminar de pasar todas direcciones de archivos de datos en config.py y quitarlas de modulos
 - Módulo de dividendos y splits.
 - Gestión de transacciones recurrentes.
-- Cálculo fiscal con FIFO/LIFO y compensación de plusvalías.
 - Sistema multiusuario con login y base de datos local o en la nube.
 - Exportación en PDF/Excel con formato limpio.
 - Despliegue en la nube (Streamlit Sharing, Docker, etc.).
