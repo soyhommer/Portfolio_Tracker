@@ -303,7 +303,7 @@ pip install --upgrade -r requirements.txt
 
 ---
 
-## 🚀 Roadmap futuro
+## 🚀 Roadmap futuro (por prioridades)
 
 - Rehacer morningstar_fetcher.py con la nueva web de morningstar
 - Cálculo fiscal con FIFO/LIFO y compensación de plusvalías. Ajustar calculo de rentabilidad con RoR, TWT y MWR con el balance FIFO de cada activo.
