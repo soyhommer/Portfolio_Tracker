@@ -6,9 +6,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import quote
 from lxml import html
-
-CACHE_PATH = Path("data/cache_nav_ft.json")
-CACHE_TTL_HORAS = 24
+from utils.nav_cache import cargar_valido_de_cache, guardar_en_cache
+from utils.formatting import parsear_numero_con_miles_y_decimales
 
 HEADERS = {
     "User-Agent": (
@@ -20,26 +19,6 @@ HEADERS = {
 
 def es_isin(valor: str) -> bool:
     return bool(re.fullmatch(r"[A-Z]{2}[A-Z0-9]{10}", valor.upper()))
-
-def cargar_cache():
-    if CACHE_PATH.exists():
-        with open(CACHE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-def guardar_cache(cache):
-    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(CACHE_PATH, "w", encoding="utf-8") as f:
-        json.dump(cache, f, ensure_ascii=False, indent=2)
-
-def guardar_en_cache(nombre_clave, data):
-    print(f"📝 Guardando en caché: {nombre_clave}")
-    cache = cargar_cache()
-    cache[nombre_clave.lower()] = {
-        "timestamp": datetime.now().isoformat(),
-        "data": data
-    }
-    guardar_cache(cache)
 
 def buscar_en_cache(nombre_clave):
     cache = cargar_cache()
@@ -68,10 +47,12 @@ def buscar_url_ft_por_nombre(nombre: str) -> str | None:
         print(f"⚠️ Error buscando por nombre en FT: {e}")
     return None
 
-def buscar_nav_ft(identificador: str) -> dict | None:
+def buscar_nav_ft(identificador: str, portfolio_name: str) -> dict | None:
     print(f"🔍 Buscando NAV en FT.com para: {identificador}")
-    clave_cache = f"isin:{identificador}" if es_isin(identificador) else f"nombre:{identificador}"
-    resultado_cache = buscar_en_cache(clave_cache)
+
+    clave_cache = (f"isin:{identificador}" if es_isin(identificador) else f"nombre:{identificador}").lower()
+
+    resultado_cache = cargar_valido_de_cache("ft", portfolio_name, clave_cache)
     if resultado_cache:
         return resultado_cache
 
@@ -88,82 +69,40 @@ def buscar_nav_ft(identificador: str) -> dict | None:
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Depuración HTML local (temporal)
+        # Depuración HTML local (opcional)
         with open("debug_ft_last.html", "w", encoding="utf-8") as f:
             f.write(soup.prettify())
 
-       # NAV
+        # NAV
         nav = None
         nav_tag = soup.find("span", class_="mod-ui-data-list__value")
         if nav_tag:
-            try:
-                nav = float(nav_tag.text.strip().replace(",", ""))
-            except Exception as e:
-                print(f"⚠️ Error extrayendo NAV: {e}")
+            nav_raw = nav_tag.text.strip()
+            nav = parsear_numero_con_miles_y_decimales(nav_raw)
+            if nav is None:
+                print(f"⚠️ Error al parsear NAV: {nav_raw}")
 
-        # #Aquisicion de 1d%
-        # variacion_1d_bs = None
-        # variacion_1d_xpath = None
-
-        # try:
-            # # ✅ Método 1: BeautifulSoup (bloque principal)
-            # var_tag = soup.find("span", class_="mod-format--neg") or soup.find("span", class_="mod-format--pos")
-            # if var_tag:
-                # for string in var_tag.strings:
-                    # if "%" in string:
-                        # porcentaje = string.split("/")[-1].strip().replace("%", "").replace(",", ".")
-                        # variacion_1d_bs = float(porcentaje)
-                        # break
-
-            # # ✅ Método 2: BeautifulSoup (tabla secundaria)
-            # if variacion_1d_bs is None:
-                # filas = soup.select("table.mod-ui-data-list__table tr")
-                # for fila in filas:
-                    # encabezado = fila.find("span", class_="mod-ui-data-list__label")
-                    # if encabezado and "Day Change" in encabezado.text:
-                        # valor = fila.find("span", class_="mod-ui-data-list__value")
-                        # if valor and "%" in valor.text:
-                            # texto = valor.text.strip().split("/")[-1].replace("%", "").replace(",", ".")
-                            # variacion_1d_bs = float(texto)
-                            # break
-
-            # # ✅ Método 3: XPath puro como último recurso
-            # try:
-                # tree = html.fromstring(response.text)
-                # nodes = tree.xpath('/html/body/div[3]/div[2]/section[1]/div/div/div[1]/div[2]/ul/li[2]/span[2]/span/text()')
-                # if nodes:
-                    # porcentaje_xpath = nodes[0].strip().split("/")[-1].replace("%", "").replace(",", ".")
-                    # variacion_1d_xpath = float(porcentaje_xpath)
-            # except Exception as e:
-                # print(f"⚠️ XPath fallback falló: {e}")
-            
-            # ✅ Selección final del valor más confiable
-            # variacion_1d = None
-            # if variacion_1d_bs is not None:
-                # variacion_1d = variacion_1d_bs
-            # elif variacion_1d_xpath is not None:
-                # variacion_1d = variacion_1d_xpath
-
-            # ⚠️ Validación cruzada (debug opcional)
-            # if variacion_1d_bs and variacion_1d_xpath:
-                # diferencia = abs(variacion_1d_bs - variacion_1d_xpath)
-                # if diferencia > 0.05:
-                    # print(f"⚠️ Discrepancia entre métodos BS={variacion_1d_bs} vs XPath={variacion_1d_xpath} -> Usando BS")
-
-        # except Exception as e:
-            # print(f"⚠️ Error extrayendo variación diaria: {e}")
-        
-        #Aquisicion de 1d% por Xpath
+        # Variación 1d% por XPath
         variacion_1d = None
         try:
             tree = html.fromstring(response.text)
             nodes = tree.xpath('/html/body/div[3]/div[2]/section[1]/div/div/div[1]/div[2]/ul/li[2]/span[2]/span/text()')
             if nodes:
-                texto_xpath = nodes[0].strip().split("/")[-1].replace("%", "").replace(",", ".")
-                variacion_1d = float(texto_xpath)
+                texto_xpath = nodes[0].strip()
+                print(f"🔎 Nodo variacion_1d bruto: {texto_xpath}")
+
+                if "/" in texto_xpath:
+                    partes = texto_xpath.split("/")
+                    porcentaje_parte = partes[-1].strip().replace("%", "")
+                    variacion_1d = parsear_numero_con_miles_y_decimales(porcentaje_parte)
+                else:
+                    # Fallback si no hay barra
+                    porcentaje_parte = texto_xpath.strip().replace("%", "")
+                    variacion_1d = parsear_numero_con_miles_y_decimales(porcentaje_parte)
         except Exception as e:
             print(f"⚠️ XPath fallback falló: {e}")
-    
+
+
         # Fecha
         fecha = None
         fecha_tag = soup.find("div", class_="mod-disclaimer")
@@ -194,7 +133,7 @@ def buscar_nav_ft(identificador: str) -> dict | None:
                     divisa = texto.split(":")[1].strip().upper()
         except Exception as e:
             print(f"⚠️ No se pudo extraer divisa: {e}")
-        
+
         # ISIN correcto - primer intento en cabecera
         isin = None
         isin_tag = soup.find("span", class_="mod-tearsheet-overview__header_symbol")
@@ -230,7 +169,7 @@ def buscar_nav_ft(identificador: str) -> dict | None:
             "variacion_1d": variacion_1d
         }
 
-        guardar_en_cache(clave_cache, resultado)
+        guardar_en_cache("ft", portfolio_name, clave_cache, resultado)
         return resultado
 
     except Exception as e:

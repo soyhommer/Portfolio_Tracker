@@ -1,0 +1,98 @@
+{
+  "isin:es0114638036": {
+    "timestamp": "2025-07-08T12:47:14.330332",
+    "data": {
+      "nombre": "Bestinver Internacional FI",
+      "isin": "ES0114638036",
+      "nav": 64.53,
+      "fecha": "2025-07-04T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:es0112611001": {
+    "timestamp": "2025-07-08T12:47:41.539048",
+    "data": {
+      "nombre": "Azvalor Internacional FI",
+      "isin": "ES0112611001",
+      "nav": 238.91,
+      "fecha": "2025-07-03T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:es0182527038": {
+    "timestamp": "2025-07-08T12:48:07.734400",
+    "data": {
+      "nombre": "Cartesio Y FI",
+      "isin": "ES0182527038",
+      "nav": 3359.95,
+      "fecha": "2025-07-04T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:es0124037005": {
+    "timestamp": "2025-07-08T12:48:34.797978",
+    "data": {
+      "nombre": "Cobas Selección C FI",
+      "isin": "ES0124037005",
+      "nav": 146.07,
+      "fecha": "2025-07-04T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:lu0690375182": {
+    "timestamp": "2025-07-08T12:49:02.631248",
+    "data": {
+      "nombre": "Fundsmith Equity Fund T EUR Acc",
+      "isin": "LU0690375182",
+      "nav": 61.1,
+      "fecha": "2025-07-07T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:ie0031724234": {
+    "timestamp": "2025-07-08T12:49:29.888436",
+    "data": {
+      "nombre": "Seilern World Growth EUR H R",
+      "isin": "IE0031724234",
+      "nav": 345.04,
+      "fecha": "2025-07-04T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:es0173394034": {
+    "timestamp": "2025-07-08T12:49:56.277737",
+    "data": {
+      "nombre": "Renta 4 Bolsa España R FI",
+      "isin": "ES0173394034",
+      "nav": 48.84,
+      "fecha": "2025-07-04T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  },
+  "isin:ie00b2nxkw18": {
+    "timestamp": "2025-07-08T12:50:25.674811",
+    "data": {
+      "nombre": "Seilern World Growth EUR U R",
+      "isin": "IE00B2NXKW18",
+      "nav": 484.38,
+      "fecha": "2025-07-04T00:00:00.000Z",
+      "divisa": "EUR",
+      "fuente": "Finect.com",
+      "variacion_1d": null
+    }
+  }
+}

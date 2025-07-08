@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 from utils.nav_fetcher import get_nav_real as get_nav
 from utils.nav_fetcher import cargar_cache_nav
-from utils.nav_cache import actualizar_cache_isin
+from utils.nav_fetcher import actualizar_cache_isin
 from utils.config import TRANSACCIONES_DIR, NAV_HISTORICO_DIR
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(message)s")
@@ -55,8 +55,8 @@ def guardar_transacciones(cartera, df):
     # return "—"
 
 @st.cache_data
-def extraer_isin(nombre):
-    cache = cargar_cache_nav()
+def extraer_isin(nombre, cartera):
+    cache = cargar_cache_nav(cartera)
     datos = cache.get(nombre)
     if datos and datos.get("isin") and datos.get("nav") is not None:
         return datos["isin"]
@@ -148,10 +148,10 @@ def mostrar_tabla_transacciones(cartera):
         return isinstance(x, str) and x.strip() != "" and x != "—"
 
     if "ISIN" not in df.columns:
-        df["ISIN"] = df["Posición"].apply(extraer_isin)
+        df["ISIN"] = df["Posición"].apply(lambda nombre: extraer_isin(nombre, cartera))
     else:
         df["ISIN"] = df["ISIN"].where(df["ISIN"].apply(es_isin_valido))
-        df["ISIN"] = df["ISIN"].fillna(df["Posición"].apply(extraer_isin))
+        df["ISIN"] = df["ISIN"].fillna(df["Posición"].apply(lambda nombre: extraer_isin(nombre, cartera)))
 
     # Colocar ISIN justo después de "Posición"
     cols = df.columns.tolist()
@@ -214,7 +214,8 @@ def mostrar_tabla_transacciones(cartera):
             nombre = row["Posición"]
             isin = row.get("ISIN")
             if isinstance(nombre, str) and isinstance(isin, str) and isin.strip() and isin != "—":
-                actualizar_cache_isin(nombre, isin)
+                actualizar_cache_isin(nombre, isin, cartera)
+
 
         st.success("✅ Cambios guardados correctamente.")
         st.rerun()

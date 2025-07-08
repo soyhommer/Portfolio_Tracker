@@ -1,4 +1,6 @@
+import re
 import streamlit as st
+
 
 def mostrar_dataframe_formateado(df):
     if df.empty:
@@ -32,3 +34,41 @@ def mostrar_dataframe_formateado(df):
         styled = styled.applymap(formatear_negativos, subset=["1 d%"])
 
     st.dataframe(styled, use_container_width=True, height=600)
+    
+
+def parsear_numero_con_miles_y_decimales(texto: str) -> float | None:
+    """
+    Normaliza un string numérico con posibles separadores de miles y decimales
+    al formato Python (punto decimal).
+    
+    Soporta formatos:
+    - Europeo: 1.117,540 -> 1117.540
+    - US:      1,117.540 -> 1117.540
+
+    Returns:
+        float | None
+    """
+    if not texto:
+        return None
+
+    texto = texto.strip()
+
+    if "." in texto and "," in texto:
+        # Ambos separadores presentes
+        if texto.find(".") < texto.find(","):
+            # Formato europeo: punto miles, coma decimal
+            texto = texto.replace(".", "").replace(",", ".")
+        else:
+            # Formato US: coma miles, punto decimal
+            texto = texto.replace(",", "")
+    elif "," in texto:
+        # Solo coma: asumir decimal europeo
+        texto = texto.replace(".", "").replace(",", ".")
+    else:
+        # Solo punto o ningún separador
+        texto = texto.replace(",", "")
+
+    try:
+        return float(texto)
+    except ValueError:
+        return None

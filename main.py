@@ -37,10 +37,12 @@ if cartera_activa:
     st.session_state['cartera'] = cartera_activa
 else:
     st.warning("No hay carteras disponibles. Crea una para empezar.")
+
+# Formulario siempre disponible
 crear_cartera_si_necesario()
 
 # Navegación entre pestañas
-menu = st.sidebar.radio("Navegar a:", ["General", "Rentabilidad", "Ganancias / Pérdidas", "Flujos", "Transacciones", "Cargar Históricos NAV"])
+menu = st.sidebar.radio("Navegar a:", ["General", "Rentabilidad", "Ganancias y Pérdidas", "Flujos", "Transacciones", "Cargar Históricos NAV"])
 
 if menu == "General":
     st.subheader(f"Resumen general - {cartera_activa}")
@@ -60,18 +62,18 @@ if menu == "General":
         or not isinstance(ultima, datetime)
         or (ahora - ultima) > timedelta(hours=CACHE_TTL_HORAS)
     ):
-        refrescar_navs_si_expirados(df_transacciones)
+        refrescar_navs_si_expirados(df_transacciones, cartera_activa)
         st.session_state["navs_ultima_actualizacion"] = ahora
         print(f"⏱️ NAVs actualizados automáticamente a las {ahora}")
 
     # Botón de actualización manual
     if st.button("🔄 Refrescar manualmente NAVs"):
-        refrescar_navs_si_expirados(df_transacciones, forzar=True)
+        refrescar_navs_si_expirados(df_transacciones, cartera_activa, forzar=True)
         st.session_state["navs_ultima_actualizacion"] = datetime.now()
         st.success("✅ NAVs actualizados manualmente.")
         st.rerun()
 
-    df_resultado = calcular_estado_actual(df_transacciones)
+    df_resultado = calcular_estado_actual(df_transacciones, cartera_activa)
     mostrar_dataframe_formateado(df_resultado)
     
     st.markdown("---")

@@ -88,7 +88,7 @@ def calcular_balance_pct_fila(row):
             return 0
 
 
-def calcular_ganancias_perdidas(df):
+def calcular_ganancias_perdidas(df, cartera):
     from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
     df = limpiar_isin(df)
     validar_isin_vs_nombre(df)
@@ -126,12 +126,12 @@ def calcular_ganancias_perdidas(df):
     nombre_map = df.groupby("ISIN")["Posición"].agg(lambda x: x.mode().iloc[0] if not x.mode().empty else x.iloc[-1]).reset_index()
     resumen = pd.merge(resumen, nombre_map, on="ISIN", how="left").rename(columns={"Posición": "Nombre del activo"})
 
-    def obtener_nav(row):
+    def obtener_nav(row, cartera):
         isin = row.get("ISIN", "").strip().replace("\u200b", "").replace("\u00a0", "") if isinstance(row.get("ISIN"), str) else ""
         nombre = row.get("Nombre del activo")
-        return get_nav(isin) or get_nav(nombre) or {}
+        return get_nav(isin, cartera) or get_nav(nombre, cartera) or {}
 
-    nav_data = resumen.apply(obtener_nav, axis=1)
+    nav_data = resumen.apply(obtener_nav, axis=1, cartera=cartera)
     resumen["NAV actual"] = nav_data.apply(lambda x: x.get("nav"))
     resumen["ISIN"] = nav_data.apply(lambda x: x.get("isin", "—"))
 
@@ -228,7 +228,7 @@ def mostrar_ganancias_perdidas(cartera):
         resultado = cargar_cache_ganancias(cartera)
     else:
         df_trans = cargar_transacciones(cartera)
-        resultado = calcular_ganancias_perdidas(df_trans)
+        resultado = calcular_ganancias_perdidas(df_trans, cartera)
         guardar_cache_ganancias(resultado, cartera)
 
     resultado.reset_index(drop=True, inplace=True)

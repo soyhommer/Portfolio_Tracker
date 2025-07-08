@@ -5,13 +5,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.morningstar_fetcher import buscar_nav_morningstar
 
 def test_morningstar(nombre):
-    resultado = buscar_nav_morningstar(nombre)
-    if resultado:
-        print("✅ Resultado:")
-        for k, v in resultado.items():
-            print(f"  {k}: {v}")
-    else:
-        print("❌ No se encontró NAV o hubo error.")
+    print(f"\n🧪 TEST: Buscando en Morningstar -> {nombre}\n")
+    try:
+        resultado = buscar_nav_morningstar(nombre)
+        if resultado:
+            print("✅ Resultado encontrado:")
+            for k, v in resultado.items():
+                print(f"  {k}: {v}")
+        else:
+            print("❌ No se encontró NAV o hubo error.")
+    except Exception as e:
+        print(f"❌ Excepción en test: {e}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

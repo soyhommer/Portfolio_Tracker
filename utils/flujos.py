@@ -1,11 +1,12 @@
 import os
 import pandas as pd
 import streamlit as st
+from utils.config import get_transactions_path
 
 TRANSACCIONES_DIR = "data/transacciones"
 
 def cargar_transacciones(cartera):
-    path = os.path.join(TRANSACCIONES_DIR, f"{cartera}.csv")
+    path = get_transactions_path(cartera)
     if os.path.exists(path):
         return pd.read_csv(path)
     else:

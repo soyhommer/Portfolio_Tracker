@@ -4,9 +4,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.investing_fetcher import buscar_nav_investing
 
-def test_investing(nombre):
+PORTFOLIO = "TestPortfolio"
+
+def test_investing(nombre, portfolio_name):
     # print(f"🔍 Buscando NAV en Investing.com para: {nombre}")
-    resultado = buscar_nav_investing(nombre)
+    resultado = buscar_nav_investing(nombre, portfolio_name)
     if resultado:
         print("✅ Resultado:")
         for k, v in resultado.items():
@@ -19,4 +21,4 @@ if __name__ == "__main__":
         print("Uso: python -m tests.test_investing_fetcher \"Nombre del fondo\"")
     else:
         nombre_fondo = " ".join(sys.argv[1:])
-        test_investing(nombre_fondo)
+        test_investing(nombre_fondo, PORTFOLIO)

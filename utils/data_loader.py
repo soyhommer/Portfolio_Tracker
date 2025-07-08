@@ -3,49 +3,27 @@ import json
 import shutil
 import streamlit as st
 import pandas as pd
-from utils.config import CARTERAS_PATH
+from utils.config import CARTERAS_PATH, TRANSACCIONES_DIR
 
 DATA_DIR = "data"
 CARTERAS_FILE = os.path.join(DATA_DIR, "carteras.json")
 TRANSACCIONES_DIR = os.path.join(DATA_DIR, "transacciones")
 
 def cargar_carteras():
-    if not os.path.exists(CARTERAS_FILE):
-        return {}
-    with open(CARTERAS_FILE, "r", encoding="utf-8") as f:
+    if not CARTERAS_PATH.exists():
+        return []
+    with open(CARTERAS_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
 def guardar_carteras(carteras):
-    with open(CARTERAS_FILE, "w", encoding="utf-8") as f:
-        json.dump(carteras, f, indent=2)
+    with open(CARTERAS_PATH, "w", encoding="utf-8") as f:
+        json.dump(carteras, f, indent=2, ensure_ascii=False)
 
 def seleccionar_cartera(carteras):
     if not carteras:
         return None
     return st.sidebar.selectbox("Selecciona una cartera", carteras)
-
-# def crear_cartera_si_necesario():
-    # with st.sidebar.expander("➕ Crear nueva cartera"):
-        # nombre = st.text_input("Nombre de la cartera")
-        # moneda = st.selectbox("Moneda base", ["EUR", "USD", "GBP"])
-        # benchmark = st.text_input("Benchmark (nombre o índice)")
-        # if st.button("Crear cartera"):
-            # if not nombre:
-                # st.warning("El nombre no puede estar vacío.")
-                # return
-            # carteras = cargar_carteras()
-            # if nombre in carteras:
-                # st.warning("Ya existe una cartera con ese nombre.")
-                # return
-            # carteras.append(nombre)
-            # guardar_carteras(carteras)
-            # os.makedirs(TRANSACCIONES_DIR, exist_ok=True)
-            # df_vacio = pd.DataFrame(columns=["Posición", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"])
-            # df_vacio.to_csv(os.path.join(TRANSACCIONES_DIR, f"{nombre}.csv"), index=False)
-            # st.success(f"Cartera '{nombre}' creada correctamente. Recarga para seleccionarla.")
-            # st.experimental_rerun()
-          
-
+        
 def crear_cartera_si_necesario():
     with st.sidebar.expander("➕ Crear nueva cartera"):
         nombre = st.text_input("Nombre de la cartera")

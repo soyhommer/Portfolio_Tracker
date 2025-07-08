@@ -4,8 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.ft_fetcher import buscar_nav_ft
 
-def test_ft(isin):
-    resultado = buscar_nav_ft(isin)
+PORTFOLIO = "TestPortfolio"
+
+def test_ft(isin, portfolio_name):
+    resultado = buscar_nav_ft(isin, portfolio_name)
     if resultado:
         print("✅ Resultado:")
         for k, v in resultado.items():
@@ -18,4 +20,4 @@ if __name__ == "__main__":
         print("Uso: python -m tests.test_ft_fetcher \"ISIN del fondo\"")
     else:
         isin_fondo = " ".join(sys.argv[1:])
-        test_ft(isin_fondo)
+        test_ft(isin_fondo, PORTFOLIO)

@@ -15,7 +15,7 @@ def cargar_transacciones(cartera):
 
 from datetime import datetime
 
-def calcular_estado_actual(df):
+def calcular_estado_actual(df, cartera: str, forzar_nav: bool = False):
     from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
     df = limpiar_isin(df)
     validar_isin_vs_nombre(df)
@@ -88,9 +88,10 @@ def calcular_estado_actual(df):
 
         datos_nav = {}
         if isin and isin != "—":
-            datos_nav = get_nav(isin) or get_nav(nombre) or {}
+            datos_nav = get_nav(isin, cartera, forzar=forzar_nav) or get_nav(nombre, cartera, forzar=forzar_nav) or {}
         else:
-            datos_nav = get_nav(nombre) or {}
+            datos_nav = get_nav(nombre, cartera, forzar=forzar_nav) or {}
+
 
         print(f"📦 Resultado: {datos_nav}")
 

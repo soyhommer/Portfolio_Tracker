@@ -10,7 +10,7 @@ CACHE_TTL_HORAS = 24
 with open("config/settings.json", "r", encoding="utf-8") as f:
     SETTINGS = json.load(f)
 
-CARTERAS_PATH = SETTINGS["carteras_path"]
+CARTERAS_PATH = Path(SETTINGS["carteras_path"])
 
 # --------------------------
 # Rutas base de datos locales
@@ -56,3 +56,16 @@ def get_ganancias_cache_path(portfolio_name: str) -> Path:
     Returns the Path to the Gananchias cached calculations CSV for a specific portfolio.
     """
     return CACHE_DIR / f"{portfolio_name}_ganancias.csv"
+
+def get_cache_nav_path(source: str, portfolio_name: str) -> Path:
+    """
+    Devuelve la ruta completa al archivo de caché NAV para una fuente y cartera concretas.
+
+    Args:
+        source (str): Nombre de la fuente (por ejemplo 'finect', 'ft', 'investing', 'real').
+        portfolio_name (str): Nombre de la cartera activa.
+
+    Returns:
+        Path: Ruta al archivo JSON de caché correspondiente.
+    """
+    return CACHE_DIR / f"{portfolio_name}_nav_{source}.json"

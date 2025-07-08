@@ -244,7 +244,7 @@ def listar_isins_disponibles() -> list:
 
     return sorted(isins)
 
-def resumen_historicos_cargados():
+def guardar_historico_isin(df_nuevo: pd.DataFrame, isin: str, forzar_scraping: bool = True):
     """
     Devuelve DataFrame con resumen de ISINs cargados:
     ISIN, nº intervalos, fecha inicio más antigua, fecha fin más reciente

@@ -1,0 +1,10 @@
+{
+  "nombre": "Pictet-CHF Bonds P",
+  "isin": "LU0135487659",
+  "nav": 492.8,
+  "fecha": "2025-07-04",
+  "divisa": "CHF",
+  "variacion_1d": 0.08,
+  "fuente": "ft",
+  "fuente_variacion": "ft"
+}
