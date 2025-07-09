@@ -2,11 +2,12 @@ import os
 import re
 import json
 import streamlit as st
+import pandas as pd
 from datetime import datetime
 from pathlib import Path
 from utils.merge_nav_data import merge_nav_data
 from utils.nav_cache import cargar_valido_de_cache, guardar_en_cache
-from utils.config import get_cache_nav_path
+from utils.config import get_cache_nav_path, CACHE_TTL_HORAS
 
 def es_isin(valor):
     return isinstance(valor, str) and re.fullmatch(r"[A-Z]{2}[A-Z0-9]{10}", valor.strip())
@@ -14,19 +15,52 @@ def es_isin(valor):
 def limpiar_isin(df):
     """
     Limpia y valida la columna 'ISIN' de un DataFrame de transacciones.
-    Elimina caracteres invisibles, convierte valores no válidos en None.
+    Convierte cualquier valor en texto seguro, elimina espacios invisibles,
+    o lo deja en None si es inválido.
     """
     if "ISIN" not in df.columns:
         return df
 
     def normalizar(x):
-        if not isinstance(x, str):
+        try:
+            if x is None or pd.isna(x):
+                return None
+
+            x = str(x)
+            x = x.strip().replace("\u200b", "").replace("\u00a0", "")
+
+            if not x or x.lower() == "nan":
+                return None
+
+            if re.fullmatch(r"[A-Z]{2}[A-Z0-9]{10}", x):
+                return x
+
+        except Exception:
             return None
-        x = x.strip().replace("\u200b", "").replace("\u00a0", "")
-        return x if re.fullmatch(r"[A-Z]{2}[A-Z0-9]{10}", x) else None
+
+        return None
 
     df["ISIN"] = df["ISIN"].apply(normalizar)
     return df
+
+def normalizar_isin(valor):
+    """
+    Asegura que el ISIN sea string limpio o None.
+    Evita errores con tipos numéricos, None o NaN.
+    """
+    if valor is None or pd.isna(valor):
+        return None
+
+    try:
+        valor = str(valor)
+    except Exception:
+        return None
+
+    valor = valor.strip().replace("\u200b", "").replace("\u00a0", "")
+    if valor == "" or valor.lower() == "nan":
+        return None
+
+    return valor
 
 def validar_isin_vs_nombre(df):
     if "ISIN" not in df.columns or "Posición" not in df.columns:
@@ -53,7 +87,39 @@ def validar_isin_vs_nombre(df):
         try:
             st.warning("⚠️ Algunos ISIN están asociados a más de un nombre. Consulta consola para detalles.")
         except:
-            pas
+            pass
+
+def corregir_nombres_por_isin(df, cartera):
+    """
+    Usa la caché de NAV para forzar que todas las transacciones tengan el nombre oficial
+    asociado al ISIN. Limpia el valor de cache y el original para evitar tipos no texto.
+    """
+    cache = cargar_cache_nav(cartera)
+    df = df.copy()
+
+    def limpiar_texto(x):
+        if x is None or pd.isna(x):
+            return None
+        try:
+            x = str(x)
+        except Exception:
+            return None
+        x = x.strip().replace("\u200b", "").replace("\u00a0", "")
+        if x == "" or x.lower() == "nan":
+            return None
+        return x
+
+    def obtener_nombre(row):
+        isin = limpiar_texto(row.get("ISIN"))
+        original = limpiar_texto(row.get("Posición"))
+        clave = f"isin:{isin}".lower() if isin else ""
+        if clave in cache and cache[clave].get("nombre"):
+            return limpiar_texto(cache[clave]["nombre"])
+        return original
+
+    df["Posición"] = df.apply(obtener_nombre, axis=1)
+    return df
+
 
 def cargar_cache_nav(portfolio_name: str) -> dict:
     """
@@ -65,9 +131,10 @@ def cargar_cache_nav(portfolio_name: str) -> dict:
         with open(path, "r", encoding="utf-8") as f:
             base = json.load(f)
         extendido = dict(base)
+        #impide añadir al dict nombres que no sean texto.
         for val in base.values():
             nombre = val.get("nombre")
-            if nombre and nombre.lower() not in extendido:
+            if isinstance(nombre, str) and nombre.strip() and nombre.lower() not in extendido:
                 extendido[nombre.lower()] = val
         return extendido
     return {}
@@ -78,14 +145,28 @@ def guardar_cache_nav(portfolio_name: str, cache: dict):
     """
     path = get_cache_nav_path("real", portfolio_name)
     path.parent.mkdir(parents=True, exist_ok=True)
+    def limpiar_valor_cache(item):
+        if not isinstance(item, dict):
+            return None
+        nombre = item.get("nombre")
+        if not isinstance(nombre, str) or not nombre.strip():
+            item["nombre"] = None
+        return item
+
+    cache_limpio = {k: limpiar_valor_cache(v) for k, v in cache.items() if limpiar_valor_cache(v)}
+
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(cache, f, indent=2, ensure_ascii=False)
+        json.dump(cache_limpio, f, indent=2, ensure_ascii=False)
 
 def get_nav_real(nombre_o_isin: str, portfolio_name: str, forzar: bool = False) -> dict | None:
     """
     Devuelve los datos de NAV (nav, fecha, divisa, variación, etc.) a partir del nombre o ISIN del activo.
     """
+    print(f"🪵 [LOG] get_nav_real recibe: {nombre_o_isin} (tipo: {type(nombre_o_isin)})")
+    if not isinstance(nombre_o_isin, str):
+        nombre_o_isin = str(nombre_o_isin)
     nombre_o_isin = nombre_o_isin.strip()
+        
     cache = cargar_cache_nav(portfolio_name)
 
     import inspect
@@ -202,7 +283,16 @@ def actualizar_cache_isin(nombre: str, nuevo_isin: str, portfolio_name: str):
             }
         else:
             resultado["isin"] = nuevo_isin.strip()
-            resultado["nombre"] = nombre
+            # Garantizar nombre siempre sea string limpio o None
+            if nombre is None or pd.isna(nombre):
+                resultado["nombre"] = None
+            else:
+                try:
+                    resultado["nombre"] = str(nombre).strip().replace("\u200b", "").replace("\u00a0", "")
+                    if resultado["nombre"] == "" or resultado["nombre"].lower() == "nan":
+                        resultado["nombre"] = None
+                except Exception:
+                    resultado["nombre"] = None
 
         # 3. Guardar en cache bajo las claves por ISIN y por nombre
         clave_isin = f"isin:{nuevo_isin.strip()}".lower()

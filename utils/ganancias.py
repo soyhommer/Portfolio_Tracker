@@ -8,8 +8,6 @@ from utils.fifo import process_fifo_for_isin, apply_fifo_to_dataframe
 from utils.config import get_transactions_path, get_ganancias_cache_path
 
 import logging
-
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(message)s")
 logger = logging.getLogger(__name__)
 
 ###############################
@@ -157,10 +155,8 @@ def calcular_ganancias_perdidas(df, cartera):
         "+/- desde compra (%)": 2
     })
 
-    resumen["+/- desde compra (%)"] = resumen["+/- desde compra (%)"].apply(
-        lambda x: f"{x:.2f}%" if pd.notnull(x) else ""
-    )       
-
+    resumen["+/- desde compra (%)"] = resumen["+/- desde compra (%)"].round(2)
+     
     total_desembolso = resumen["Desembolso"].sum()
     total_reembolso = resumen["Reembolso"].sum()
     total_valor_mercado = resumen["Valor de mercado (EUR)"].sum()
@@ -215,27 +211,112 @@ def calcular_ganancias_perdidas(df, cartera):
 
 def highlight_cells(val):
     try:
+        logger.debug(f"🎨 Aplicando estilo a valor: {val}")
         if pd.isna(val):
             return ""
         if float(val) < 0:
             return "color: red;"
-    except (ValueError, TypeError):
-        pass
+    except (ValueError, TypeError) as e:
+        logger.error(f"❌ Error aplicando estilo: {e}")
+        return ""
     return ""
 
 def mostrar_ganancias_perdidas(cartera):
-    if cache_es_valido(cartera):
-        resultado = cargar_cache_ganancias(cartera)
-    else:
-        df_trans = cargar_transacciones(cartera)
-        resultado = calcular_ganancias_perdidas(df_trans, cartera)
-        guardar_cache_ganancias(resultado, cartera)
+    st.subheader(f"Resultados de ganancias/pérdidas para {cartera}")
 
-    resultado.reset_index(drop=True, inplace=True)
+    try:
+        if cache_es_valido(cartera):
+            resultado = cargar_cache_ganancias(cartera)
+        else:
+            df_trans = cargar_transacciones(cartera)
+            if df_trans.empty:
+                st.warning(f"⚠️ La cartera **{cartera}** no tiene transacciones registradas.")
+                return
 
-    resultado_styled = resultado.style.applymap(
-        highlight_cells,
-        subset=["+/- desde compra (EUR)", "+/- desde compra (%)"]
-    )
+            resultado = calcular_ganancias_perdidas(df_trans, cartera)
+            guardar_cache_ganancias(resultado, cartera)
 
-    st.dataframe(resultado_styled, use_container_width=True)
+        if resultado is None or resultado.empty:
+            st.warning(f"⚠️ No se encontraron datos de ganancias/pérdidas para **{cartera}**.")
+            return
+
+        # Validar columnas necesarias
+        columns_needed = ["+/- desde compra (EUR)", "+/- desde compra (%)"]
+        missing = [col for col in columns_needed if col not in resultado.columns]
+        if missing:
+            st.error(f"❌ ERROR: faltan columnas requeridas en el resultado: {missing}")
+            return
+
+        # Verificar caso "solo fila TOTAL"
+        if resultado.shape[0] == 1 and resultado.iloc[0]["Nombre del activo"] == "💼 TOTAL":
+            st.warning(
+                f"⚠️ Todas las posiciones de la cartera **{cartera}** están liquidadas o vendidas."
+            )
+            st.dataframe(resultado, use_container_width=True)
+            return
+
+        # Normalizar columna porcentaje
+        try:
+            resultado["+/- desde compra (%)"] = (
+                resultado["+/- desde compra (%)"]
+                .astype(str)
+                .str.replace("%", "", regex=True)
+                .replace("", "0")
+                .astype(float)
+            )
+        except Exception as e:
+            st.error(f"❌ Error al procesar columna porcentaje: {e}")
+            st.dataframe(resultado)
+            return
+
+        resultado.reset_index(drop=True, inplace=True)
+
+        resultado_styled = resultado.style.applymap(
+            highlight_cells,
+            subset=columns_needed
+        )
+             
+        # Reset index
+        resultado.reset_index(drop=True, inplace=True)
+        
+        # Reordenar columnas para que Desembolso, Coste vendido y Reembolso queden juntas en ese orden
+        cols = resultado.columns.tolist()
+
+        # Lista base de columnas deseadas
+        ordered_block = ["Desembolso", "Coste vendido", "Reembolso"]
+
+        # Sacar las tres del listado si están
+        for c in ordered_block:
+            if c in cols:
+                cols.remove(c)
+
+        # Elegir dónde insertarlas. Ejemplo: justo después de 'Participaciones'
+        if "Participaciones" in cols:
+            insert_pos = cols.index("Participaciones") + 1
+        else:
+            insert_pos = 0  # o al inicio si no está
+
+        # Insertar en bloque en el orden deseado
+        for c in reversed(ordered_block):
+            cols.insert(insert_pos, c)
+
+        # Aplicar el nuevo orden
+        resultado = resultado[cols]
+
+        # Ahora sí creamos el Styler con el orden correcto
+        resultado_styled = resultado.style.applymap(
+            highlight_cells,
+            subset=columns_needed
+        )
+
+        st.dataframe(resultado_styled, use_container_width=True)
+      
+    except Exception as e:
+        st.error(f"❌ Error crítico al mostrar resultados: {e}")
+        st.stop()
+
+
+
+
+
+

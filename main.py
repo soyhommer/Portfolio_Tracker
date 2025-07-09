@@ -13,6 +13,18 @@ from utils.config import CACHE_TTL_HORAS
 from utils.formatting import mostrar_dataframe_formateado
 from utils.historial_nav import mostrar_gestor_historicos_nav
 
+import logging
+
+# ✅ Configurar logging global de forma segura para Streamlit (evita duplicados en rerun)
+logger = logging.getLogger()
+
+if not logger.hasHandlers():
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    )
+    logging.debug("✅ Logging global configurado en nivel DEBUG")
+
 # Configuración inicial
 st.set_page_config(page_title="Gestor de Carteras", layout="wide")
 
@@ -86,11 +98,14 @@ elif menu == "Rentabilidad":
     else:
         st.warning("Selecciona una cartera para ver su rentabilidad.")
         
-elif menu == "Ganancias / Pérdidas":
+elif menu == "Ganancias y Pérdidas":
+    logger.info("📌 PESTAÑA SELECCIONADA: Ganancias / Pérdidas")
     st.subheader("Histórico de resultados")
     if "cartera" in st.session_state:
+        logger.debug(f"✅ Cartera activa en sesión: {st.session_state['cartera']}")
         mostrar_ganancias_perdidas(st.session_state["cartera"])
     else:
+        logger.warning("⚠️ No hay cartera en session_state")
         st.warning("Selecciona una cartera para visualizar los resultados.")
         
 elif menu == "Flujos":
@@ -111,4 +126,4 @@ elif menu == "Transacciones":
 
 elif menu == "Cargar Históricos NAV":
     st.subheader("Cargar Históricos NAV")
-    mostrar_gestor_historicos_nav()
+    mostrar_gestor_historicos_nav(cartera_activa)

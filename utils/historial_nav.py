@@ -131,6 +131,33 @@ def leer_csv_investing(file) -> pd.DataFrame:
     print("\n✅✅✅ LECTURA Y NORMALIZACIÓN COMPLETADAS ✅✅✅")
     return df
 
+
+def resumen_historicos_cargados():
+    """
+    Devuelve DataFrame con resumen de ISINs cargados:
+    ISIN, nº intervalos, fecha inicio más antigua, fecha fin más reciente
+    """
+    resumen = []
+
+    isins = listar_isins_disponibles()
+    for isin in isins:
+        df = cargar_historico_isin(isin)
+        intervalos = detectar_intervalos_continuos(df)
+        if intervalos:
+            fechas_inicio = [i["start"] for i in intervalos]
+            fechas_fin = [i["end"] for i in intervalos]
+            nombre_activo = get_nombre_activo_por_isin(isin)
+
+            resumen.append({
+                "Nombre de activo": nombre_activo,
+                "ISIN": isin,
+                "Nº intervalos": len(intervalos),
+                "Inicio más antiguo": min(fechas_inicio),
+                "Fin más reciente": max(fechas_fin)
+            })
+
+    return pd.DataFrame(resumen)
+
 def cargar_historico_isin(isin: str) -> pd.DataFrame:
     """
     Carga el histórico guardado para un ISIN desde /data/nav_historico/{ISIN}.csv
@@ -397,28 +424,25 @@ def detectar_faltantes_nav_por_cartera(transacciones_dir, nav_historico_dir):
         ])
 
 #Funcion para el Frontend
-def mostrar_gestor_historicos_nav():
+def mostrar_gestor_historicos_nav(portfolio_name: str):
     """
-    Componente de Streamlit para cargar históricos.
+    Componente de Streamlit para gestionar históricos NAV.
+    - Revisión de cobertura NAV
     - Tabla resumen de ISINs ya cargados
-    - Selector de ISIN (existente o nuevo)
-    - FileUploader para CSV
-    - Vista previa del CSV cargado
-    - Tabla de intervalos ya cargados
-    - Botón para guardar
+    - Selector de ISIN para carga o edición
+    - Subida de CSV Investing.com
     """
     st.header("📥 Gestor de Históricos NAV")
-    st.markdown("""
+    st.markdown(f"""
     Esta sección te permite cargar históricos de precios (fondos, ETFs, acciones) 
-    descargados desde Investing.com. Puedes añadir nuevos tramos de fechas 
-    de forma incremental sin perder datos ya cargados.
+    descargados desde Investing.com para la cartera **{portfolio_name}**. 
+    Puedes añadir nuevos tramos de fechas de forma incremental sin perder datos ya cargados.
     """)
 
-    # 6️⃣ Revisión de cobertura NAV
+    # 1️⃣ Revisión de cobertura NAV global (todas carteras)
     st.markdown("---")
     st.header("📊 Revisión de Cobertura NAV")
 
-    # Ejecuta la revisión
     faltantes_df = detectar_faltantes_nav_por_cartera(TRANSACCIONES_DIR, NAV_HISTORICO_DIR)
 
     if not faltantes_df.empty:
@@ -431,23 +455,23 @@ def mostrar_gestor_historicos_nav():
     else:
         st.success("✅ Todas las transacciones de todas las carteras están cubiertas con datos NAV disponibles.")
 
-    # 0️⃣ Resumen de ISINs ya cargados en el sistema
+    # 2️⃣ Resumen de ISINs ya cargados en esta cartera
     st.markdown("---")
+    st.subheader(f"📋 Resumen de ISINs cargados en {portfolio_name}")
+
     df_resumen = resumen_historicos_cargados()
 
-    st.subheader("📋 ISINs ya cargados en el sistema")
-    if not df_resumen.empty:
+    if df_resumen is not None and not df_resumen.empty:
         st.dataframe(df_resumen, use_container_width=True)
+        isins = df_resumen["ISIN"].dropna().unique().tolist()
     else:
-        st.info("ℹ️ Aún no hay históricos cargados en el sistema.")
+        st.info(f"ℹ️ Aún no hay históricos cargados para la cartera **{portfolio_name}**.")
+        isins = []
 
-    
     st.markdown("---")
 
-    # 1️⃣ Selección o entrada de ISIN
+    # 3️⃣ Selección o entrada de ISIN
     col1, col2 = st.columns(2)
-
-    isins = df_resumen["ISIN"].tolist() if not df_resumen.empty else []
 
     with col1:
         isin_existente = st.selectbox("📌 ISIN ya cargado:", options=[""] + isins)
@@ -457,14 +481,13 @@ def mostrar_gestor_historicos_nav():
 
     isin_final = (isin_nuevo or isin_existente).strip()
 
-    # 2️⃣ Subida del CSV
+    # 4️⃣ Subida del CSV
     archivo = st.file_uploader(
         "📂 Sube el archivo CSV de Investing.com",
         type=["csv"],
         help="Debe contener columnas: Date, Price, Open, High, Low, Change %"
     )
 
-    
     st.caption(
         """
         ⚠️ El archivo CSV debe tener estas columnas EXACTAS (con este orden y ortografía):
@@ -474,9 +497,8 @@ def mostrar_gestor_historicos_nav():
         - El separador de columnas debe ser punto y coma (`;`).
         """
     )
-    
 
-    # 3️⃣ Vista previa del CSV subido
+    # 5️⃣ Vista previa del CSV subido
     if archivo and isin_final:
         try:
             df_subido = leer_csv_investing(archivo)
@@ -485,7 +507,7 @@ def mostrar_gestor_historicos_nav():
         except Exception as e:
             st.error(f"❌ Error al procesar el CSV: {e}")
 
-    # 4️⃣ Ver intervalos ya cargados
+    # 6️⃣ Ver intervalos ya cargados
     if isin_final:
         df_actual = cargar_historico_isin(isin_final)
         if not df_actual.empty:
@@ -495,11 +517,12 @@ def mostrar_gestor_historicos_nav():
         else:
             st.info("ℹ️ No hay datos aún para este ISIN.")
 
-    # 5️⃣ Botón para guardar
+    # 7️⃣ Botón para guardar
     if archivo and isin_final:
         if st.button("💾 Guardar histórico NAV"):
             guardar_historico_isin(df_subido, isin_final)
             st.success(f"✅ Histórico actualizado para ISIN: {isin_final}")
             st.rerun()
+
 
    

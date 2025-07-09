@@ -306,7 +306,6 @@ pip install --upgrade -r requirements.txt
 ## 🚀 Roadmap futuro (por prioridades)
 
 - Validación de stock negativo de transacciones via Excel y verificación de "Vental total" con fecha anterior a ultima venta por las 3 vías (edicion formulario/nueva transaccion/excel)
-- Rehacer morningstar_fetcher.py con la nueva web de morningstar
 - Cálculo fiscal con FIFO/LIFO y compensación de plusvalías. Ajustar calculo de rentabilidad con RoR, TWT y MWR con el balance FIFO de cada activo.
 - Datos Divisas y cambios para expresarlo todo en la moneda base de la cartera.
 - Terminar de pasar todas direcciones de archivos de datos en config.py y quitarlas de modulos

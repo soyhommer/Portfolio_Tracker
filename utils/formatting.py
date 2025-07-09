@@ -36,22 +36,34 @@ def mostrar_dataframe_formateado(df):
     st.dataframe(styled, use_container_width=True, height=600)
     
 
-def parsear_numero_con_miles_y_decimales(texto: str) -> float | None:
+def parsear_numero_con_miles_y_decimales(valor) -> float | None:
     """
-    Normaliza un string numérico con posibles separadores de miles y decimales
+    Normaliza un valor numérico con posibles separadores de miles y decimales
     al formato Python (punto decimal).
     
     Soporta formatos:
     - Europeo: 1.117,540 -> 1117.540
     - US:      1,117.540 -> 1117.540
 
-    Returns:
-        float | None
+    Acepta también ints y floats directamente.
     """
-    if not texto:
+    import pandas as pd
+
+    # ✅ Si es None o NaN → devolver None
+    if valor is None or (isinstance(valor, float) and pd.isna(valor)):
         return None
 
-    texto = texto.strip()
+    # ✅ Si ya es float o int → convertir directamente
+    if isinstance(valor, (int, float)):
+        return float(valor)
+
+    try:
+        texto = str(valor).strip()
+    except Exception:
+        return None
+
+    if texto == "" or texto.lower() == "nan":
+        return None
 
     if "." in texto and "," in texto:
         # Ambos separadores presentes
@@ -72,3 +84,4 @@ def parsear_numero_con_miles_y_decimales(texto: str) -> float | None:
         return float(texto)
     except ValueError:
         return None
+

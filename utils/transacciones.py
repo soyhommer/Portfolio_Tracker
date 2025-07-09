@@ -1,14 +1,16 @@
 import os
 import re
-import logging
+import uuid
 import pandas as pd
 import streamlit as st
 from utils.nav_fetcher import get_nav_real as get_nav
 from utils.nav_fetcher import cargar_cache_nav
 from utils.nav_fetcher import actualizar_cache_isin
+from utils.nav_fetcher import limpiar_isin, normalizar_isin, corregir_nombres_por_isin
 from utils.config import TRANSACCIONES_DIR, NAV_HISTORICO_DIR
+from utils.formatting import parsear_numero_con_miles_y_decimales
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(message)s")
+import logging
 logger = logging.getLogger(__name__)
 
 # DATA_DIR = "data"
@@ -19,14 +21,15 @@ def obtener_ruta_transacciones(cartera):
 
 def cargar_transacciones(cartera):
     path = obtener_ruta_transacciones(cartera)
-    columnas_correctas = ["Posición", "ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
+    columnas_correctas = ["ID_UNICO", "Posición", "ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
 
     if os.path.exists(path):
         df = pd.read_csv(path)
-        # Quitar columnas no esperadas
+
+        # Filtrar solo columnas válidas
         df = df[[col for col in df.columns if col in columnas_correctas]]
 
-        # Asegurar todas las columnas correctas
+        # Asegurar todas las columnas existan
         for col in columnas_correctas:
             if col not in df.columns:
                 if col in ["Posición", "ISIN", "Tipo", "Moneda"]:
@@ -34,18 +37,49 @@ def cargar_transacciones(cartera):
                 else:
                     df[col] = 0.0
 
-        # Reordenar
+        # Asignar ID_UNICO si faltan o están vacíos
+        if "ID_UNICO" not in df.columns:
+            df["ID_UNICO"] = [str(uuid.uuid4()) for _ in range(len(df))]
+        else:
+            df["ID_UNICO"] = df["ID_UNICO"].fillna("").replace("", None)
+            df["ID_UNICO"] = df["ID_UNICO"].apply(lambda x: x if x and x.strip() else str(uuid.uuid4()))
+
+        # Reordenar columnas
         df = df[columnas_correctas]
+
+        # Normalizar columna Posición a texto limpio
+        if "Posición" in df.columns:
+            df["Posición"] = df["Posición"].apply(
+                lambda x: str(x).strip().replace("\u200b", "").replace("\u00a0", "") if pd.notna(x) else ""
+            )
+            df["Posición"] = df["Posición"].replace("nan", "")
+
         return df
 
     else:
+        # CSV no existe aún
         return pd.DataFrame(columns=columnas_correctas)
-
 
 def guardar_transacciones(cartera, df):
     path = obtener_ruta_transacciones(cartera)
-    df.to_csv(path, index=False)
 
+    print(f"✅ [guardar_transacciones] Guardando CSV en: {path}")
+    print(f"✅ [guardar_transacciones] Número de filas: {len(df)}")
+    print(f"✅ [guardar_transacciones] Columnas: {list(df.columns)}")
+    print(f"✅ [guardar_transacciones] Primeras filas:\n{df.head()}")
+
+    try:
+        # Convertir todas las columnas a string seguro
+        df = df.copy()
+        for col in df.columns:
+            df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
+
+        df.to_csv(path, index=False)
+        print("✅ [guardar_transacciones] Guardado correctamente.")
+
+    except Exception as e:
+        print(f"❌ ERROR al guardar CSV: {e}")
+        raise e
 
 # @st.cache_data
 # def extraer_isin(nombre):
@@ -63,31 +97,49 @@ def extraer_isin(nombre, cartera):
     return "—"
 
 def validar_stock_no_negativo(df_transacciones: pd.DataFrame) -> list:
-    df_transacciones = df_transacciones.copy()
-    df_transacciones = df_transacciones.sort_values(["ISIN", "Fecha"])
-
+    """
+    Valida que ninguna transacción provoque stock negativo de participaciones,
+    incluso tras ediciones en Streamlit (conversión defensiva de tipos).
+    """
     problemas = []
 
+    # 🩹 Conversión crítica
+    df_transacciones = df_transacciones.copy()
+    df_transacciones["Fecha"] = pd.to_datetime(df_transacciones["Fecha"], errors="coerce")
+    df_transacciones["Participaciones"] = pd.to_numeric(df_transacciones["Participaciones"], errors="coerce").fillna(0.0)
+
+    # Eliminar fechas inválidas
+    df_transacciones = df_transacciones.dropna(subset=["Fecha"])
+
+    # Orden correcto
+    df_transacciones = df_transacciones.sort_values(["ISIN", "Fecha"])
+
     for isin, group in df_transacciones.groupby("ISIN"):
-        saldo_participaciones = 0.0
+        saldo = 0.0
 
         for _, row in group.iterrows():
-            tipo = str(row["Tipo"]).lower()
+            tipo = str(row["Tipo"]).strip().lower()
             participaciones = row["Participaciones"]
 
-            if pd.isna(participaciones):
-                participaciones = 0
-
             if tipo.startswith("compra"):
-                saldo_participaciones += participaciones
+                saldo += participaciones
+
+            elif tipo.startswith("venta total"):
+                if saldo <= 1e-4 and participaciones > 0:
+                    problemas.append(isin)
+                    break
+                if abs(saldo - participaciones) > 1e-4:
+                    problemas.append(isin)
+                    break
+                saldo = 0.0
+
             elif tipo.startswith("venta"):
-                saldo_participaciones -= participaciones
+                saldo -= participaciones
+                if saldo < -1e-4:
+                    problemas.append(isin)
+                    break
 
-            if saldo_participaciones < -1e-4:
-                problemas.append(isin)
-                break  # ya no hace falta seguir revisando este ISIN
-
-    return problemas
+    return list(set(problemas))
 
 def mostrar_tabla_transacciones(cartera):
     
@@ -99,7 +151,7 @@ def mostrar_tabla_transacciones(cartera):
     # Filtrar columnas válidas
     columnas_correctas = [
         "Seleccionar", "Posición", "ISIN", "Tipo", 
-        "Participaciones", "Fecha", "Moneda", "Precio", "Gasto", "Valor operación"
+        "Participaciones", "Fecha", "Moneda", "Precio", "Gasto", "Valor operación", "ID_UNICO"
     ]
     df = df[[col for col in df.columns if col in columnas_correctas]]
 
@@ -201,21 +253,66 @@ def mostrar_tabla_transacciones(cartera):
 
     # Botón para guardar todas las ediciones
     if st.button("💾 Guardar cambios en transacciones"):
-    
-        df_guardar = df_editado.drop(columns=["Seleccionar"])
+        COLUMNS_BASE = ["ID_UNICO", "Posición", "ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
 
-        if not validar_stock_no_negativo(df_guardar):
-            st.error("❌ Error: hay ventas que exceden el stock disponible. Corrige antes de guardar.")
-            return
+        # Eliminar columnas derivadas y asegurar columnas base
+        df_guardar = df_editado.drop(columns=["Seleccionar"], errors="ignore")
+        if "Valor operación" in df_guardar.columns:
+            df_guardar = df_guardar.drop(columns=["Valor operación"])
         
-        guardar_transacciones(cartera, df_guardar)
+        # Asegurar ID_UNICO
+        if "ID_UNICO" not in df_guardar.columns:
+            df_guardar["ID_UNICO"] = [str(uuid.uuid4()) for _ in range(len(df_guardar))]
+        else:
+            df_guardar["ID_UNICO"] = df_guardar["ID_UNICO"].fillna("").replace("", None)
+            df_guardar["ID_UNICO"] = df_guardar["ID_UNICO"].apply(lambda x: x if x and x.strip() else str(uuid.uuid4()))
 
+        df_guardar = df_guardar[COLUMNS_BASE]
+
+        # Forzar tipos
+        df_guardar["Fecha"] = pd.to_datetime(df_guardar["Fecha"], errors="coerce").dt.strftime("%Y-%m-%d")
+        df_guardar["Participaciones"] = pd.to_numeric(df_guardar["Participaciones"], errors="coerce").fillna(0.0)
+        df_guardar["Precio"] = pd.to_numeric(df_guardar["Precio"], errors="coerce").fillna(0.0)
+        df_guardar["Gasto"] = pd.to_numeric(df_guardar["Gasto"], errors="coerce").fillna(0.0)
+
+        # Cargar histórico y limpiar columnas
+        df_historico = cargar_transacciones(cartera)
+        if "ID_UNICO" not in df_historico.columns:
+            df_historico["ID_UNICO"] = [str(uuid.uuid4()) for _ in range(len(df_historico))]
+        df_historico["Fecha"] = pd.to_datetime(df_historico["Fecha"], errors="coerce").dt.strftime("%Y-%m-%d")
+        df_historico["Participaciones"] = pd.to_numeric(df_historico["Participaciones"], errors="coerce").fillna(0.0)
+        df_historico["Precio"] = pd.to_numeric(df_historico["Precio"], errors="coerce").fillna(0.0)
+        df_historico["Gasto"] = pd.to_numeric(df_historico["Gasto"], errors="coerce").fillna(0.0)
+        df_historico = df_historico[COLUMNS_BASE]
+
+        # ✅ DEBUG antes de merge para comparar
+        st.write("📌 df_guardar antes de merge")
+        st.dataframe(df_guardar)
+        st.write("📌 df_historico antes de merge")
+        st.dataframe(df_historico)
+
+        # Merge reemplazando editadas por ID_UNICO
+        claves = ["ID_UNICO"]
+        df_total = pd.concat([df_historico, df_guardar]).drop_duplicates(subset=claves, keep="last")
+
+        # Recalcular Valor operación
+        df_total["Valor operación"] = df_total["Participaciones"] * df_total["Precio"] + df_total["Gasto"]
+        df_total["Valor operación"] = df_total["Valor operación"].round(2)
+
+        # Validar stock
+        if not validar_stock_no_negativo(df_total):
+            st.error("❌ Error: hay ventas que exceden el stock disponible en el histórico completo. Corrige antes de guardar.")
+            return
+
+        # Guardar
+        guardar_transacciones(cartera, df_total)
+
+        # Actualizar ISIN en caché
         for _, row in df_guardar.iterrows():
             nombre = row["Posición"]
             isin = row.get("ISIN")
             if isinstance(nombre, str) and isinstance(isin, str) and isin.strip() and isin != "—":
                 actualizar_cache_isin(nombre, isin, cartera)
-
 
         st.success("✅ Cambios guardados correctamente.")
         st.rerun()
@@ -367,7 +464,7 @@ def formulario_nueva_transaccion(cartera: str) -> None:
 
             # Autocompletar nombre si está vacío
             if not nombre.strip():
-                datos_nav = get_nav(identificador)
+                datos_nav = get_nav(identificador, cartera)
                 if datos_nav and "nombre" in datos_nav:
                     nombre = datos_nav["nombre"]
                     mensajes_autocompletado.append(f"✔️ Nombre autocompletado: {nombre}")
@@ -401,6 +498,7 @@ def formulario_nueva_transaccion(cartera: str) -> None:
 
             # ✅ CONSTRUYE SOLO SI PASÓ TODO
             nueva_fila = {
+                "ID_UNICO": str(uuid.uuid4()),
                 "Posición": nombre,
                 "ISIN": identificador,
                 "Tipo": tipo,
@@ -490,46 +588,203 @@ def buscar_nav_para_transaccion(isin, fecha, nav_historico_dir):
 def importar_transacciones_excel(cartera):
     st.markdown("---")
     st.subheader("📥 Importar transacciones desde Excel")
-    archivo = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])    
+
+    # ✅ Inicializar variables de estado si no existen
+    if "importado_exitoso" not in st.session_state:
+        st.session_state["importado_exitoso"] = False
+    
+    # ✅ Evitar rerun infinito si ya importó
+    if st.session_state["importado_exitoso"]:
+        st.success("✅ Archivo ya importado correctamente. Si quieres volver a cargar otro, recarga la página.")
+        st.stop()
+
+    # ✅ Usar clave en uploader para poder limpiar después
+    archivo = st.file_uploader(
+        "Selecciona un archivo Excel",
+        type=["xlsx"],        
+    )
+
+    st.markdown("""
+📌 **Formato requerido del archivo Excel (.xlsx):**
+    - **Obligatorio**: ISIN, Tipo, Participaciones, Fecha, Moneda, Precio, Gasto
+    - **Opcional**: Posición (Nombre del activo)
+    - ISIN es la clave maestra. El sistema usará la caché para asignar el nombre correcto.
+    """)
+
     if archivo is not None:
         try:
-            df_excel = pd.read_excel(archivo)
-            columnas_esperadas = ["Posición", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
-            if not all(col in df_excel.columns for col in columnas_esperadas):
-                st.error("El archivo no contiene todas las columnas requeridas.")
-                return
-            df = cargar_transacciones(cartera)
-            df = pd.concat([df, df_excel], ignore_index=True)
-            
-            from utils.nav_fetcher import limpiar_isin, validar_isin_vs_nombre
-            df = limpiar_isin(df)
-            validar_isin_vs_nombre(df)                     
+            st.write("🟢 PASO 1: Archivo recibido correctamente")
 
-            #Vigilancia de stock de participaciones
-            problemas = validar_stock_no_negativo(df)
+            # ✅ 1. Leer Excel
+            df_excel = pd.read_excel(archivo, dtype={"ISIN": str})
+            st.write("✅ PASO 2: Excel leído")
+            st.dataframe(df_excel)
+
+            # ✅ 2. Definir normalizador seguro
+            def normalizar_texto(x):
+                if x is None or pd.isna(x):
+                    return None
+                try:
+                    return str(x).strip()
+                except Exception as e:
+                    st.error(f"❌ Error normalizando texto: {e}")
+                    return None
+
+            # ✅ 3. Asegurar columnas esperadas
+            for col in ["ISIN", "Tipo", "Moneda", "Posición"]:
+                if col not in df_excel.columns:
+                    st.warning(f"⚠️ Columna {col} faltaba en Excel: añadida como None")
+                    df_excel[col] = None
+            st.write("✅ PASO 3: Columnas aseguradas")
+            st.dataframe(df_excel)
+
+            # ✅ 4. Aplicar normalizador
+            for col in ["ISIN", "Tipo", "Moneda", "Posición"]:
+                df_excel[col] = df_excel[col].apply(normalizar_texto)
+            st.write("✅ PASO 4: Columnas de texto normalizadas")
+            st.dataframe(df_excel)
+
+            # ✅ 5. Limpieza de ISIN
+            df_excel = limpiar_isin(df_excel)
+            st.write("✅ PASO 5: limpiar_isin aplicado")
+            st.dataframe(df_excel)
+
+            # ✅ 6. Corregir nombres con cache
+            df_excel = corregir_nombres_por_isin(df_excel, cartera)
+            st.write("✅ PASO 6: corregir_nombres_por_isin aplicado")
+            st.dataframe(df_excel)
+
+            #Generar identificador unico por transaccion
+            if "ID_UNICO" not in df_excel.columns:
+                df_excel["ID_UNICO"] = [str(uuid.uuid4()) for _ in range(len(df_excel))]
+            else:
+                df_excel["ID_UNICO"] = df_excel["ID_UNICO"].fillna("").replace("", None)
+                df_excel["ID_UNICO"] = df_excel["ID_UNICO"].apply(lambda x: x if x and x.strip() else str(uuid.uuid4()))
+
+            # ✅ 7. Normalizar números
+            for col in ["Participaciones", "Precio", "Gasto"]:
+                df_excel[col] = df_excel[col].apply(parsear_numero_con_miles_y_decimales).fillna(0.0)
+            st.write("✅ PASO 7: Números normalizados")
+            st.dataframe(df_excel)
+
+            # ✅ 8. Verificar columnas obligatorias
+            columnas_obligatorias = ["ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
+            if not all(col in df_excel.columns for col in columnas_obligatorias):
+                st.error("❌ El archivo no contiene todas las columnas obligatorias.")
+                return
+            st.write("✅ PASO 8: Columnas obligatorias presentes")
+
+            # ✅ 9. Convertir tipos
+            df_excel["Participaciones"] = pd.to_numeric(df_excel["Participaciones"], errors="coerce").fillna(0.0)
+            df_excel["Precio"] = pd.to_numeric(df_excel["Precio"], errors="coerce").fillna(0.0)
+            df_excel["Gasto"] = pd.to_numeric(df_excel["Gasto"], errors="coerce").fillna(0.0)
+            df_excel["Fecha"] = pd.to_datetime(df_excel["Fecha"], errors="coerce")
+            st.write("✅ PASO 9: Conversión de tipos")
+            st.dataframe(df_excel)
+
+            # ✅ 10. Validar fechas
+            if df_excel["Fecha"].isnull().any():
+                st.error("❌ Hay fechas inválidas en el archivo. Revisa el formato (YYYY-MM-DD).")
+                return
+            st.write("✅ PASO 10: Fechas validadas")
+
+            # ✅ 11. Redondear
+            df_excel["Participaciones"] = df_excel["Participaciones"].round(6)
+            df_excel["Precio"] = df_excel["Precio"].round(4)
+            df_excel["Gasto"] = df_excel["Gasto"].round(2)
+            st.write("✅ PASO 11: Decimales redondeados")
+            st.dataframe(df_excel)
+
+            # ✅ 12. Validar ISIN
+            if df_excel["ISIN"].isnull().any():
+                st.error("❌ Todas las transacciones deben tener ISIN válido. Corrige el Excel y vuelve a cargarlo.")
+                return
+            st.write("✅ PASO 12: ISINs validados")
+
+            # ✅ 13. Cargar histórico
+            df_actual = cargar_transacciones(cartera)
+            df_actual["Fecha"] = pd.to_datetime(df_actual["Fecha"], errors="coerce")
+            st.write("✅ PASO 13: Histórico cargado (con Fecha convertido a datetime)")
+            st.dataframe(df_actual)
+
+            # ✅ 14. Validar fechas VS Venta Total
+            try:
+                df_hist = df_actual.copy()
+                df_hist["Fecha"] = pd.to_datetime(df_hist["Fecha"], errors="coerce")
+                df_excel["Fecha"] = pd.to_datetime(df_excel["Fecha"], errors="coerce")
+
+                isins_con_error = []
+
+                for isin in df_excel["ISIN"].unique():
+                    ventas_totales_hist = df_hist[
+                        (df_hist["ISIN"] == isin) &
+                        (df_hist["Tipo"].str.lower().str.startswith("venta total"))
+                    ]
+                    if ventas_totales_hist.empty:
+                        continue
+
+                    fecha_ultima_venta_total = ventas_totales_hist["Fecha"].max()
+
+                    nuevas_trans = df_excel[df_excel["ISIN"] == isin]
+                    if not nuevas_trans.empty and nuevas_trans["Fecha"].min() <= fecha_ultima_venta_total:
+                        isins_con_error.append((isin, fecha_ultima_venta_total.date()))
+
+                if isins_con_error:
+                    st.error("❌ No se puede importar: hay transacciones con fecha anterior o igual a la última Venta Total ya registrada.")
+                    for isin, fecha in isins_con_error:
+                        st.warning(f"- ISIN: {isin} (Venta Total en {fecha})")
+                    st.info("✏️ Corrige tu Excel para quitar esas líneas o actualizar sus fechas.")
+                    return
+
+                st.write("✅ PASO 14: Fechas vs. Venta Total validadas correctamente")
+            except Exception as e:
+                st.error(f"❌ Error validando fechas vs. Venta Total: {e}")
+                return
+
+            # ✅ 15. Merge con histórico
+            st.write(f"✅ Histórico actual tiene {len(df_actual)} filas")
+            st.write(f"✅ Excel nuevo tiene {len(df_excel)} filas")
+
+            df_total = pd.concat([df_actual, df_excel], ignore_index=True)
+            st.write(f"✅ Tras concat, total de filas = {len(df_total)}")
+
+            COLUMNAS_TODAS = ["ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto", "Posición"]
+            df_total = df_total.drop_duplicates(subset=COLUMNAS_TODAS)
+            st.write(f"✅ Tras quitar duplicados exactos (todas columnas), total de filas = {len(df_total)}")
+
+            df_total["Fecha"] = pd.to_datetime(df_total["Fecha"], errors="coerce")
+            st.write("✅ Fecha convertida a datetime en todo el DataFrame")
+
+            st.write("✅ PASO 15: Histórico + Nuevas transacciones concatenadas y limpias")
+            st.dataframe(df_total)
+
+            st.download_button(
+                label="⬇️ Descargar CSV de DF_TOTAL para inspección",
+                data=df_total.to_csv(index=False).encode('utf-8'),
+                file_name='df_total_para_validacion.csv',
+                mime='text/csv'
+            )
+
+            # ✅ 16. Validar stock negativo
+            problemas = validar_stock_no_negativo(df_total)
             if problemas:
-                st.error("❌ La transacción NO se ha guardado porque crearía participaciones negativas en:")
-                for fondo in problemas:
-                    st.warning(f"- {fondo}")
-                st.info("✏️ Corrige los datos del formulario o añade otras transacciones válidas.")
-                
-                # Desbloquear botón
-                if "form_transaccion" in st.session_state:
-                    st.session_state["form_transaccion"] = False
-
-                # Limpiar campos si quieres (opcional)
-                st.session_state.pop("ISIN / Ticker / Código", None)
-                st.session_state.pop("Nombre del activo", None)
-                st.session_state.pop("Participaciones", None)
-                st.session_state.pop("Precio unitario", None)
-                st.session_state.pop("Gasto (opcional)", None)
+                st.error("❌ La importación NO se ha guardado porque generaría stock negativo en:")
+                for isin in problemas:
+                    st.warning(f"- {isin}")
+                st.info("✏️ Corrige el archivo Excel para resolver estos problemas antes de volver a subirlo.")
                 return
+            st.write("✅ PASO 16: Validación de stock negativo superada")
 
-            guardar_transacciones(cartera, df)
-            st.success(f"Se han importado {len(df_excel)} transacciones correctamente.")
+            # ✅ 17. Guardar CSV final
+            guardar_transacciones(cartera, df_total)
+            st.session_state["importado_exitoso"] = True
+            st.session_state["uploaded_file"] = None
+            st.success(f"✅ Se han importado {len(df_excel)} transacciones correctamente.")
             st.rerun()
+
         except Exception as e:
-            st.error(f"Error al procesar el archivo: {e}")
+            st.error(f"❌ Error general al procesar el archivo: {e}")
+
             
 def obtener_participaciones_actuales(isin, fecha, cartera):
     """
