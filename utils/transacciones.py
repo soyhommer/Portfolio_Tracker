@@ -148,6 +148,10 @@ def mostrar_tabla_transacciones(cartera):
     # Cargar datos del CSV
     df = cargar_transacciones(cartera)
 
+    # ✅ Forzar un único nombre oficial por ISIN usando la caché
+    from utils.nav_fetcher import corregir_nombres_por_isin
+    df = corregir_nombres_por_isin(df, cartera)
+
     # Filtrar columnas válidas
     columnas_correctas = [
         "Seleccionar", "Posición", "ISIN", "Tipo", 
@@ -215,110 +219,89 @@ def mostrar_tabla_transacciones(cartera):
     if "Seleccionar" not in df.columns:
         df.insert(0, "Seleccionar", False)
 
-    st.markdown("**✔️ Edita directamente las transacciones. Usa el icono 🗑️ para borrar filas individualmente y la casilla 'Seleccionar' para eliminar en lote. El menú de columna permite ordenar asc/desc:**")
+    st.markdown("""
+    📝 **Para editar una transacción:**
+    - Elimínala de la tabla
+    - Luego añádela de nuevo con los datos corregidos (vía formulario o Excel)
+    """)
+    
+    # ✅ Bloque de filtro múltiple por ISIN con nombres amigables
+    # ---------------------------------------------------------------
 
+    # 1️⃣ Obtener tabla única de ISIN y Nombre
+    isin_nombre_df = df.dropna(subset=["ISIN"]).drop_duplicates(subset=["ISIN"])[["ISIN", "Posición"]]
+
+    # 2️⃣ Construir lista legible: "ISIN - Nombre"
+    opciones_display = [
+        f"{row['ISIN']} - {row['Posición']}" for _, row in isin_nombre_df.iterrows()
+    ]
+
+    # 3️⃣ Crear mapeo inverso para recuperar solo el ISIN
+    display_to_isin = {
+        f"{row['ISIN']} - {row['Posición']}": row["ISIN"]
+        for _, row in isin_nombre_df.iterrows()
+    }
+
+    # 4️⃣ Mostrar multiselect con etiquetas enriquecidas
+    seleccionados_display = st.multiselect(
+        label="🔎 Filtrar transacciones por uno o más ISIN (opcional):",
+        options=opciones_display,
+        help="Selecciona uno o más códigos ISIN para mostrar solo sus transacciones."
+    )
+
+    # 5️⃣ Extraer solo los ISIN puros seleccionados
+    isin_seleccionados = [display_to_isin[item] for item in seleccionados_display]
+
+    # 6️⃣ Aplicar el filtro si hay selección
+    if isin_seleccionados:
+        df = df[df["ISIN"].isin(isin_seleccionados)]
+
+
+    # ✅ Mostrar editor interactivo con checkbox de selección
+    # IMPORTANTE: st.data_editor devuelve el DataFrame editado con cambios del usuario  
     df_editado = st.data_editor(
         df,
         use_container_width=True,
+        disabled=[
+            "Posición", "ISIN", "Tipo", 
+            "Participaciones", "Fecha", "Moneda", "Precio", "Gasto", "Valor operación", "ID_UNICO"
+        ],
         column_config={
-            "Seleccionar": st.column_config.CheckboxColumn("Seleccionar"),
-            "Fecha": st.column_config.DateColumn(
-                label="Fecha",
-                format="YYYY-MM-DD",
-                required=True
-            ),
-            "Moneda": st.column_config.SelectboxColumn(
-                label="Moneda",
-                options=["EUR", "USD", "GBP", "CHF", "JPY"],
-                required=True
-            ),
-            "Tipo": st.column_config.SelectboxColumn(
-                label="Tipo",
-                options=["Compra", "Venta", "Venta total"],
-                required=True
-            ),
-        },
+            "Seleccionar": st.column_config.CheckboxColumn(
+                "Seleccionar", 
+                help="Marca para eliminar esta transacción"
+            )
+        }
     )
 
-    # Botón para borrar filas seleccionadas
+    # ✅ Botón para borrar filas marcadas
     if st.button("🗑️ Eliminar transacciones seleccionadas"):
+        # ➜ Usar df_editado, que contiene el estado actualizado de los checkboxes
         seleccionadas = df_editado[df_editado["Seleccionar"]]
+
         if seleccionadas.empty:
+            # ⚠️ Nada seleccionado: aviso claro al usuario
             st.warning("⚠️ No se han marcado transacciones para eliminar.")
-        else:
-            df_filtrado = df_editado[df_editado["Seleccionar"] == False].drop(columns=["Seleccionar"])
-            guardar_transacciones(cartera, df_filtrado)
-            st.success(f"✅ Se eliminaron {len(seleccionadas)} transacciones.")
-            st.rerun()
-
-    # Botón para guardar todas las ediciones
-    if st.button("💾 Guardar cambios en transacciones"):
-        COLUMNS_BASE = ["ID_UNICO", "Posición", "ISIN", "Tipo", "Participaciones", "Fecha", "Moneda", "Precio", "Gasto"]
-
-        # Eliminar columnas derivadas y asegurar columnas base
-        df_guardar = df_editado.drop(columns=["Seleccionar"], errors="ignore")
-        if "Valor operación" in df_guardar.columns:
-            df_guardar = df_guardar.drop(columns=["Valor operación"])
-        
-        # Asegurar ID_UNICO
-        if "ID_UNICO" not in df_guardar.columns:
-            df_guardar["ID_UNICO"] = [str(uuid.uuid4()) for _ in range(len(df_guardar))]
-        else:
-            df_guardar["ID_UNICO"] = df_guardar["ID_UNICO"].fillna("").replace("", None)
-            df_guardar["ID_UNICO"] = df_guardar["ID_UNICO"].apply(lambda x: x if x and x.strip() else str(uuid.uuid4()))
-
-        df_guardar = df_guardar[COLUMNS_BASE]
-
-        # Forzar tipos
-        df_guardar["Fecha"] = pd.to_datetime(df_guardar["Fecha"], errors="coerce").dt.strftime("%Y-%m-%d")
-        df_guardar["Participaciones"] = pd.to_numeric(df_guardar["Participaciones"], errors="coerce").fillna(0.0)
-        df_guardar["Precio"] = pd.to_numeric(df_guardar["Precio"], errors="coerce").fillna(0.0)
-        df_guardar["Gasto"] = pd.to_numeric(df_guardar["Gasto"], errors="coerce").fillna(0.0)
-
-        # Cargar histórico y limpiar columnas
-        df_historico = cargar_transacciones(cartera)
-        if "ID_UNICO" not in df_historico.columns:
-            df_historico["ID_UNICO"] = [str(uuid.uuid4()) for _ in range(len(df_historico))]
-        df_historico["Fecha"] = pd.to_datetime(df_historico["Fecha"], errors="coerce").dt.strftime("%Y-%m-%d")
-        df_historico["Participaciones"] = pd.to_numeric(df_historico["Participaciones"], errors="coerce").fillna(0.0)
-        df_historico["Precio"] = pd.to_numeric(df_historico["Precio"], errors="coerce").fillna(0.0)
-        df_historico["Gasto"] = pd.to_numeric(df_historico["Gasto"], errors="coerce").fillna(0.0)
-        df_historico = df_historico[COLUMNS_BASE]
-
-        # ✅ DEBUG antes de merge para comparar
-        st.write("📌 df_guardar antes de merge")
-        st.dataframe(df_guardar)
-        st.write("📌 df_historico antes de merge")
-        st.dataframe(df_historico)
-
-        # Merge reemplazando editadas por ID_UNICO
-        claves = ["ID_UNICO"]
-        df_total = pd.concat([df_historico, df_guardar]).drop_duplicates(subset=claves, keep="last")
-
-        # Recalcular Valor operación
-        df_total["Valor operación"] = df_total["Participaciones"] * df_total["Precio"] + df_total["Gasto"]
-        df_total["Valor operación"] = df_total["Valor operación"].round(2)
-
-        # Validar stock
-        if not validar_stock_no_negativo(df_total):
-            st.error("❌ Error: hay ventas que exceden el stock disponible en el histórico completo. Corrige antes de guardar.")
             return
 
-        # Guardar
-        guardar_transacciones(cartera, df_total)
+        # ➜ Filtrar solo las transacciones NO seleccionadas (las que se conservarán)
+        df_filtrado = df_editado[df_editado["Seleccionar"] == False].drop(columns=["Seleccionar"])
 
-        # Actualizar ISIN en caché
-        for _, row in df_guardar.iterrows():
-            nombre = row["Posición"]
-            isin = row.get("ISIN")
-            if isinstance(nombre, str) and isinstance(isin, str) and isin.strip() and isin != "—":
-                actualizar_cache_isin(nombre, isin, cartera)
+        # ✅ Validación defensiva:
+        # Verificar que eliminar estas líneas NO provoque saldo negativo
+        problemas = validar_stock_no_negativo(df_filtrado)
+        if problemas:
+            st.error("❌ No se pueden eliminar estas transacciones porque rompería el saldo de participaciones.")
+            for isin in problemas:
+                st.warning(f"- {isin}")
+            st.info("✏️ Corrige tu selección o revisa el historial para mantener stock coherente.")
+            return
 
-        st.success("✅ Cambios guardados correctamente.")
+        # ✅ Guardar CSV resultante tras borrar las seleccionadas
+        guardar_transacciones(cartera, df_filtrado)
+        st.success(f"✅ Se eliminaron {len(seleccionadas)} transacciones.")
         st.rerun()
-
-    return df
-
+  
 def buscar_precio_historico_cercano(isin, fecha_transaccion, nav_historico_dir, dias_max=7):
     """
     Busca en histórico NAV el precio más cercano anterior a la fecha_transaccion,
