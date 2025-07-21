@@ -1,0 +1,27 @@
+{
+  "ES0112611001": {
+    "ticker": "0P00016YQ5.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "LU0210536867": {
+    "ticker": "0P000019C5",
+    "fuente": "api",
+    "fecha": "2025-07-21"
+  },
+  "LU0702159939": {
+    "ticker": "0P0000UT4H",
+    "fuente": "api",
+    "fecha": "2025-07-21"
+  },
+  "ES0116567035": {
+    "ticker": "0P00000TJ8.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "ES0114638036": {
+    "ticker": "0P00000P2M.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  }
+}
