@@ -4,7 +4,6 @@ from utils.investing_fetcher import buscar_nav_investing
 from utils.ft_fetcher import buscar_nav_ft
 from utils.finect_fetcher import buscar_nav_finect
 
-
 def es_valido_isin(isin):
     return bool(re.fullmatch(r"[A-Z]{2}[A-Z0-9]{10}", isin or ""))
 
@@ -57,7 +56,7 @@ def merge_nav_data(identificador: str, portfolio_name: str) -> dict | None:
     fuentes = [
         ("investing", buscar_nav_investing),
         ("ft", buscar_nav_ft),
-        ("finect", buscar_nav_finect),
+        # ("finect", buscar_nav_finect),
     ]
 
     resultados = []

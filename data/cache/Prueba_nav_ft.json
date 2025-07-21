@@ -1,6 +1,6 @@
 {
   "isin:es0114638036": {
-    "timestamp": "2025-07-19T21:41:50.456854",
+    "timestamp": "2025-07-21T11:06:00.418576",
     "data": {
       "nombre": "Bestinver Internacional FI",
       "isin": "ES0114638036",
@@ -12,7 +12,7 @@
     }
   },
   "isin:es0112611001": {
-    "timestamp": "2025-07-19T21:42:54.368600",
+    "timestamp": "2025-07-21T11:06:03.750909",
     "data": {
       "nombre": "Azvalor Internacional FI",
       "isin": "ES0112611001",
@@ -24,7 +24,7 @@
     }
   },
   "isin:es0182527038": {
-    "timestamp": "2025-07-19T21:43:45.799875",
+    "timestamp": "2025-07-21T11:06:06.552053",
     "data": {
       "nombre": "Cartesio Y FI",
       "isin": "ES0182527038",
@@ -36,7 +36,7 @@
     }
   },
   "isin:es0124037005": {
-    "timestamp": "2025-07-19T21:45:08.600115",
+    "timestamp": "2025-07-21T11:06:09.546103",
     "data": {
       "nombre": "Cobas Selección C FI",
       "isin": "ES0124037005",
@@ -48,7 +48,7 @@
     }
   },
   "isin:lu0690375182": {
-    "timestamp": "2025-07-19T21:46:51.374164",
+    "timestamp": "2025-07-21T11:06:12.232874",
     "data": {
       "nombre": "Fundsmith Equity Fund T EUR Acc",
       "isin": "LU0690375182",
@@ -60,19 +60,19 @@
     }
   },
   "isin:ie0031724234": {
-    "timestamp": "2025-07-19T21:50:10.294072",
+    "timestamp": "2025-07-21T11:06:15.594254",
     "data": {
       "nombre": "Seilern World Growth EUR H R",
       "isin": "IE0031724234",
-      "nav": 339.3,
-      "fecha": "2025-07-17",
+      "nav": 337.77,
+      "fecha": "2025-07-18",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.32
+      "variacion_1d": -0.45
     }
   },
   "isin:es0173394034": {
-    "timestamp": "2025-07-19T21:53:12.368570",
+    "timestamp": "2025-07-21T11:06:18.578550",
     "data": {
       "nombre": "Renta 4 Bolsa España R FI",
       "isin": "ES0173394034",
@@ -84,15 +84,15 @@
     }
   },
   "isin:ie00b2nxkw18": {
-    "timestamp": "2025-07-19T21:56:46.682254",
+    "timestamp": "2025-07-21T11:06:21.686684",
     "data": {
       "nombre": "Seilern World Growth EUR U R",
       "isin": "IE00B2NXKW18",
-      "nav": 481.93,
-      "fecha": "2025-07-17",
+      "nav": 478.14,
+      "fecha": "2025-07-18",
       "divisa": "EUR",
       "fuente": "FT.com",
-      "variacion_1d": 0.38
+      "variacion_1d": -0.79
     }
   }
 }
