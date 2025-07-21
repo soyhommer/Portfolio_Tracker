@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from utils.investing_fetcher import buscar_url_investing_por_isin
 from utils.formatting import parsear_numero_con_miles_y_decimales
+from utils.nav_cache import cargar_valido_de_cache, guardar_en_cache
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
@@ -12,18 +13,29 @@ HEADERS = {
 
 SUFIJOS_YAHOO = ["", ".F", ".MC", ".SW", ".MI"]
 
-def buscar_nav_yahoo_por_isin(isin: str) -> dict | None:
+def buscar_nav_yahoo_por_isin(isin: str, portfolio_name: str) -> dict | None:
     """
-    Paso completo: ISIN → Ticker Yahoo (por caché o descubrimiento) → NAV
+    Fetcher compatible con merge_nav_data:
+    1. Busca ticker Yahoo desde caché o descubre.
+    2. Intenta recuperar resultado desde cache_nav_yahoo.json si está vigente.
+    3. Si no existe o está expirado, consulta la API y cachea el resultado.
     """
-    from utils.isin_yahoo_cache import obtener_ticker_yahoo_para_isin as obtener_ticker  # 🔁 evitar import circular
+    clave_cache = f"isin:{isin}".lower()
+    resultado_cache = cargar_valido_de_cache("yahoo", portfolio_name, clave_cache)
+    if resultado_cache:
+        return resultado_cache
 
-    ticker = obtener_ticker(isin)
-    if ticker:
-        resultado = buscar_nav_yahoo_por_id(ticker)
-        if resultado:
-            resultado["isin"] = isin
-            return resultado
+    from utils.isin_yahoo_cache import obtener_ticker_yahoo_para_isin
+    ticker = obtener_ticker_yahoo_para_isin(isin)
+    if not ticker:
+        return None
+
+    resultado = buscar_nav_yahoo_por_id(ticker)
+    if resultado:
+        resultado["isin"] = isin
+        guardar_en_cache("yahoo", portfolio_name, clave_cache, resultado)
+        return resultado
+
     return None
 
 def obtener_ticker_yahoo_por_isin(isin: str) -> str | None:

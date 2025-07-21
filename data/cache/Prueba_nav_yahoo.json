@@ -1,0 +1,98 @@
+{
+  "isin:es0114638036": {
+    "timestamp": "2025-07-21T16:14:25.718049",
+    "data": {
+      "nombre": "Bestinver Internacional FI",
+      "isin": "ES0114638036",
+      "nav": 65.192,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": 1.08
+    }
+  },
+  "isin:es0112611001": {
+    "timestamp": "2025-07-21T16:14:26.914515",
+    "data": {
+      "nombre": "Azvalor Internacional FI",
+      "isin": "ES0112611001",
+      "nav": 236.9427,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": 0.56
+    }
+  },
+  "isin:es0182527038": {
+    "timestamp": "2025-07-21T16:14:28.048347",
+    "data": {
+      "nombre": "0P00000TIV.F",
+      "isin": "ES0182527038",
+      "nav": 3368.1204,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": -0.24
+    }
+  },
+  "isin:es0124037005": {
+    "timestamp": "2025-07-21T16:14:29.197560",
+    "data": {
+      "nombre": "Cobas Selección C FI",
+      "isin": "ES0124037005",
+      "nav": 148.6555,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": 0.88
+    }
+  },
+  "isin:lu0690375182": {
+    "timestamp": "2025-07-21T16:14:30.426375",
+    "data": {
+      "nombre": "Fundsmith Equity T EUR Acc",
+      "isin": "LU0690375182",
+      "nav": 60.3447,
+      "fecha": "2025-07-18",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": -0.21
+    }
+  },
+  "isin:ie0031724234": {
+    "timestamp": "2025-07-21T16:14:31.604050",
+    "data": {
+      "nombre": "Seilern World Growth EUR H R",
+      "isin": "IE0031724234",
+      "nav": 339.3,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": 0.32
+    }
+  },
+  "isin:es0173394034": {
+    "timestamp": "2025-07-21T16:14:32.820179",
+    "data": {
+      "nombre": "Renta 4 Bolsa España R FI",
+      "isin": "ES0173394034",
+      "nav": 48.959,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": 0.54
+    }
+  },
+  "isin:ie00b2nxkw18": {
+    "timestamp": "2025-07-21T16:14:33.959149",
+    "data": {
+      "nombre": "Seilern World Growth EUR U R",
+      "isin": "IE00B2NXKW18",
+      "nav": 481.93,
+      "fecha": "2025-07-17",
+      "divisa": "EUR",
+      "fuente": "Yahoo Finance",
+      "variacion_1d": 0.38
+    }
+  }
+}

@@ -1,23 +1,23 @@
 {
   "isin:es0114638036": {
-    "nombre": "Bestinver Internacional Fi (114638036)",
+    "nombre": "Bestinver Internacional FI",
     "isin": "ES0114638036",
-    "nav": 65.19,
+    "nav": 65.192,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 1.08,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "es0114638036": {
-    "nombre": "Bestinver Internacional Fi (114638036)",
+    "nombre": "Bestinver Internacional FI",
     "isin": "ES0114638036",
-    "nav": 65.19,
+    "nav": 65.192,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 1.08,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "bestinver internacional fi (114638036)": {
     "nombre": "Bestinver Internacional Fi (114638036)",
@@ -30,24 +30,24 @@
     "fuente_variacion": "investing"
   },
   "isin:es0112611001": {
-    "nombre": "Azvalor Internacional Fi (0P00016YQ5)",
+    "nombre": "Azvalor Internacional FI",
     "isin": "ES0112611001",
-    "nav": 236.943,
+    "nav": 236.9427,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.56,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "es0112611001": {
-    "nombre": "Azvalor Internacional Fi (0P00016YQ5)",
+    "nombre": "Azvalor Internacional FI",
     "isin": "ES0112611001",
-    "nav": 236.943,
+    "nav": 236.9427,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.56,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "azvalor internacional fi (0p00016yq5)": {
     "nombre": "Azvalor Internacional Fi (0P00016YQ5)",
@@ -60,24 +60,24 @@
     "fuente_variacion": "investing"
   },
   "isin:es0182527038": {
-    "nombre": "Cartesio Y Fi (182527038)",
+    "nombre": "0P00000TIV.F",
     "isin": "ES0182527038",
-    "nav": 3368.12,
+    "nav": 3368.1204,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": -0.24,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "es0182527038": {
-    "nombre": "Cartesio Y Fi (182527038)",
+    "nombre": "0P00000TIV.F",
     "isin": "ES0182527038",
-    "nav": 3368.12,
+    "nav": 3368.1204,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": -0.24,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "cartesio y fi (182527038)": {
     "nombre": "Cartesio Y Fi (182527038)",
@@ -90,24 +90,24 @@
     "fuente_variacion": "investing"
   },
   "isin:es0124037005": {
-    "nombre": "Cobas Selección C Fi (0P00018W92)",
+    "nombre": "Cobas Selección C FI",
     "isin": "ES0124037005",
-    "nav": 148.656,
+    "nav": 148.6555,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.88,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "es0124037005": {
-    "nombre": "Cobas Selección C Fi (0P00018W92)",
+    "nombre": "Cobas Selección C FI",
     "isin": "ES0124037005",
-    "nav": 148.656,
+    "nav": 148.6555,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.88,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "cobas selección c fi (0p00018w92)": {
     "nombre": "Cobas Selección C Fi (0P00018W92)",
@@ -120,24 +120,24 @@
     "fuente_variacion": "investing"
   },
   "isin:lu0690375182": {
-    "nombre": "Fundsmith Equity Fund T Eur Acc (0P0000WEK5)",
+    "nombre": "Fundsmith Equity T EUR Acc",
     "isin": "LU0690375182",
-    "nav": 60.345,
+    "nav": 60.3447,
     "fecha": "2025-07-18",
     "divisa": "EUR",
     "variacion_1d": -0.21,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "lu0690375182": {
-    "nombre": "Fundsmith Equity Fund T Eur Acc (0P0000WEK5)",
+    "nombre": "Fundsmith Equity T EUR Acc",
     "isin": "LU0690375182",
-    "nav": 60.345,
+    "nav": 60.3447,
     "fecha": "2025-07-18",
     "divisa": "EUR",
     "variacion_1d": -0.21,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "fundsmith equity fund t eur acc (0p0000wek5)": {
     "nombre": "Fundsmith Equity Fund T Eur Acc (0P0000WEK5)",
@@ -150,24 +150,24 @@
     "fuente_variacion": "investing"
   },
   "isin:ie0031724234": {
-    "nombre": "Seilern World Growth Eur H R (0P0000GACF)",
+    "nombre": "Seilern World Growth EUR H R",
     "isin": "IE0031724234",
     "nav": 339.3,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.32,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "ie0031724234": {
-    "nombre": "Seilern World Growth Eur H R (0P0000GACF)",
+    "nombre": "Seilern World Growth EUR H R",
     "isin": "IE0031724234",
     "nav": 339.3,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.32,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "seilern world growth eur h r (0p0000gacf)": {
     "nombre": "Seilern World Growth Eur H R (0P0000GACF)",
@@ -180,24 +180,24 @@
     "fuente_variacion": "investing"
   },
   "isin:es0173394034": {
-    "nombre": "Renta 4 Bolsa España R Fi (173394034)",
+    "nombre": "Renta 4 Bolsa España R FI",
     "isin": "ES0173394034",
-    "nav": 48.96,
+    "nav": 48.959,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.54,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "es0173394034": {
-    "nombre": "Renta 4 Bolsa España R Fi (173394034)",
+    "nombre": "Renta 4 Bolsa España R FI",
     "isin": "ES0173394034",
-    "nav": 48.96,
+    "nav": 48.959,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.54,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "renta 4 bolsa españa r fi (173394034)": {
     "nombre": "Renta 4 Bolsa España R Fi (173394034)",
@@ -210,24 +210,24 @@
     "fuente_variacion": "investing"
   },
   "isin:ie00b2nxkw18": {
-    "nombre": "Seilern World Growth Eur U R (0P0000GACH)",
+    "nombre": "Seilern World Growth EUR U R",
     "isin": "IE00B2NXKW18",
     "nav": 481.93,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.38,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "ie00b2nxkw18": {
-    "nombre": "Seilern World Growth Eur U R (0P0000GACH)",
+    "nombre": "Seilern World Growth EUR U R",
     "isin": "IE00B2NXKW18",
     "nav": 481.93,
     "fecha": "2025-07-17",
     "divisa": "EUR",
     "variacion_1d": 0.38,
-    "fuente": "investing",
-    "fuente_variacion": "investing"
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   },
   "seilern world growth eur u r (0p0000gach)": {
     "nombre": "Seilern World Growth Eur U R (0P0000GACH)",
@@ -248,5 +248,75 @@
     "variacion_1d": 0.32,
     "fuente": "ft",
     "fuente_variacion": "ft"
+  },
+  "bestinver internacional fi": {
+    "nombre": "Bestinver Internacional FI",
+    "isin": "ES0114638036",
+    "nav": 65.192,
+    "fecha": "2025-07-17",
+    "divisa": "EUR",
+    "variacion_1d": 1.08,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
+  },
+  "azvalor internacional fi": {
+    "nombre": "Azvalor Internacional FI",
+    "isin": "ES0112611001",
+    "nav": 236.9427,
+    "fecha": "2025-07-17",
+    "divisa": "EUR",
+    "variacion_1d": 0.56,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
+  },
+  "0p00000tiv.f": {
+    "nombre": "0P00000TIV.F",
+    "isin": "ES0182527038",
+    "nav": 3368.1204,
+    "fecha": "2025-07-17",
+    "divisa": "EUR",
+    "variacion_1d": -0.24,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
+  },
+  "cobas selección c fi": {
+    "nombre": "Cobas Selección C FI",
+    "isin": "ES0124037005",
+    "nav": 148.6555,
+    "fecha": "2025-07-17",
+    "divisa": "EUR",
+    "variacion_1d": 0.88,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
+  },
+  "fundsmith equity t eur acc": {
+    "nombre": "Fundsmith Equity T EUR Acc",
+    "isin": "LU0690375182",
+    "nav": 60.3447,
+    "fecha": "2025-07-18",
+    "divisa": "EUR",
+    "variacion_1d": -0.21,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
+  },
+  "renta 4 bolsa españa r fi": {
+    "nombre": "Renta 4 Bolsa España R FI",
+    "isin": "ES0173394034",
+    "nav": 48.959,
+    "fecha": "2025-07-17",
+    "divisa": "EUR",
+    "variacion_1d": 0.54,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
+  },
+  "seilern world growth eur u r": {
+    "nombre": "Seilern World Growth EUR U R",
+    "isin": "IE00B2NXKW18",
+    "nav": 481.93,
+    "fecha": "2025-07-17",
+    "divisa": "EUR",
+    "variacion_1d": 0.38,
+    "fuente": "yahoo",
+    "fuente_variacion": "yahoo"
   }
 }

@@ -23,5 +23,35 @@
     "ticker": "0P00000P2M.F",
     "fuente": "investing",
     "fecha": "2025-07-21"
+  },
+  "ES0182527038": {
+    "ticker": "0P00000TIV.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "ES0124037005": {
+    "ticker": "0P00018W92.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "LU0690375182": {
+    "ticker": "0P0000WEK5.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "IE0031724234": {
+    "ticker": "0P0000GACF.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "ES0173394034": {
+    "ticker": "0P00000DN8.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
+  },
+  "IE00B2NXKW18": {
+    "ticker": "0P0000GACH.F",
+    "fuente": "investing",
+    "fecha": "2025-07-21"
   }
 }
