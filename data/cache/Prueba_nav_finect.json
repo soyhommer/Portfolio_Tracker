@@ -1,95 +1,95 @@
 {
   "isin:es0114638036": {
-    "timestamp": "2025-07-09T12:48:13.217880",
+    "timestamp": "2025-07-19T21:43:49.742433",
     "data": {
-      "nombre": "Bestinver Internacional FI",
+      "nombre": "Fondo sin nombre",
       "isin": "ES0114638036",
-      "nav": 64.49,
-      "fecha": "2025-07-07T00:00:00.000Z",
-      "divisa": "EUR",
+      "nav": null,
+      "fecha": null,
+      "divisa": "sin parsear",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:es0112611001": {
-    "timestamp": "2025-07-09T12:48:41.301164",
+    "timestamp": "2025-07-19T21:43:40.351009",
     "data": {
       "nombre": "Azvalor Internacional FI",
       "isin": "ES0112611001",
-      "nav": 237.67,
-      "fecha": "2025-07-07T00:00:00.000Z",
+      "nav": 236.94,
+      "fecha": "2025-07-17T00:00:00.000Z",
       "divisa": "EUR",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:es0182527038": {
-    "timestamp": "2025-07-09T12:49:08.482529",
+    "timestamp": "2025-07-19T21:46:02.310241",
     "data": {
       "nombre": "Cartesio Y FI",
       "isin": "ES0182527038",
-      "nav": 3364.4,
-      "fecha": "2025-07-07T00:00:00.000Z",
+      "nav": 3368.12,
+      "fecha": "2025-07-17T00:00:00.000Z",
       "divisa": "EUR",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:es0124037005": {
-    "timestamp": "2025-07-09T12:49:35.147943",
+    "timestamp": "2025-07-19T21:49:59.696375",
     "data": {
-      "nombre": "Cobas Selección C FI",
+      "nombre": "Fondo sin nombre",
       "isin": "ES0124037005",
-      "nav": 146.26,
-      "fecha": "2025-07-07T00:00:00.000Z",
-      "divisa": "EUR",
+      "nav": null,
+      "fecha": null,
+      "divisa": "sin parsear",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:lu0690375182": {
-    "timestamp": "2025-07-09T12:50:01.829086",
+    "timestamp": "2025-07-19T21:49:45.309790",
     "data": {
       "nombre": "Fundsmith Equity Fund T EUR Acc",
       "isin": "LU0690375182",
-      "nav": 61.01,
-      "fecha": "2025-07-08T00:00:00.000Z",
+      "nav": 60.34,
+      "fecha": "2025-07-18T00:00:00.000Z",
       "divisa": "EUR",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:ie0031724234": {
-    "timestamp": "2025-07-09T12:50:28.876460",
+    "timestamp": "2025-07-19T21:53:59.576044",
     "data": {
-      "nombre": "Seilern World Growth EUR H R",
+      "nombre": "Fondo sin nombre",
       "isin": "IE0031724234",
-      "nav": 343.26,
-      "fecha": "2025-07-07T00:00:00.000Z",
-      "divisa": "EUR",
+      "nav": null,
+      "fecha": null,
+      "divisa": "sin parsear",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:es0173394034": {
-    "timestamp": "2025-07-09T12:50:58.882890",
+    "timestamp": "2025-07-19T21:56:04.502142",
     "data": {
-      "nombre": "Renta 4 Bolsa España R FI",
+      "nombre": "Fondo sin nombre",
       "isin": "ES0173394034",
-      "nav": 48.88,
-      "fecha": "2025-07-07T00:00:00.000Z",
-      "divisa": "EUR",
+      "nav": null,
+      "fecha": null,
+      "divisa": "sin parsear",
       "fuente": "Finect.com",
       "variacion_1d": null
     }
   },
   "isin:ie00b2nxkw18": {
-    "timestamp": "2025-07-09T12:51:26.440958",
+    "timestamp": "2025-07-19T21:58:43.588984",
     "data": {
       "nombre": "Seilern World Growth EUR U R",
       "isin": "IE00B2NXKW18",
-      "nav": 482.98,
-      "fecha": "2025-07-07T00:00:00.000Z",
+      "nav": 481.93,
+      "fecha": "2025-07-17T00:00:00.000Z",
       "divisa": "EUR",
       "fuente": "Finect.com",
       "variacion_1d": null
