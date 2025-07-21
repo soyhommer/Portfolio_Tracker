@@ -12,6 +12,7 @@ openpyxl
 selenium
 plotly
 undetected-chromedriver
+yfinance
 
 #with open("requirements.txt", "w") as f:
 #    f.write(requirements.strip())
